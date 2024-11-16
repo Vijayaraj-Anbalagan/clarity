@@ -1,14 +1,10 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Toggle } from "@/components/ui/toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { MetricControlDialogWithToggle } from "@/components/metricControl";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, Mic, Paperclip, Send, Heart, Smile, ChevronLeft, ChevronRight, MoreVertical, User } from 'lucide-react';
+import {  Mic, Paperclip, Send, Heart, Smile, ChevronLeft, User } from 'lucide-react';
 const sampleQueries = [
   {
     id: 1,
@@ -60,51 +56,8 @@ const sampleQueries = [
   },
 ];
 
-function MetricSlider({ label, defaultValue }: { label: string; defaultValue: number }) {
-  return (
-    <div className="my-4">
-      <Label>{label}</Label>
-      <Slider defaultValue={[defaultValue]} max={100} step={1} className="w-full mt-2" />
-    </div>
-  );
-}
 
-export function MetricControlDialogWithToggle() {
-  return (
-    <div className="p-4">
-      {/* Toggle button to open the dialog */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Toggle className="text-yellow-400 hover:bg-stone-900">
-            <Heart className="h-4 w-4" />
-            <span className="ml-2">Empathy Mode</span>
-          </Toggle>
-        </DialogTrigger>
 
-        {/* Dialog Content */}
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Adjust Metrics</DialogTitle>
-            <DialogDescription>
-              Control the chatbot’s response style by adjusting the metrics below.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            {/* Sliders for different metrics */}
-            <MetricSlider label="Empathy" defaultValue={50} />
-            <MetricSlider label="Softness" defaultValue={40} />
-            <MetricSlider label="Motivational" defaultValue={60} />
-            <MetricSlider label="Formality" defaultValue={70} />
-            {/* Add more sliders as needed */}
-          </div>
-          <DialogFooter>
-            <Button type="submit">Save Changes</Button> {/* Submit Button */}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
 
 export default function ChatInterface() {
   return (
