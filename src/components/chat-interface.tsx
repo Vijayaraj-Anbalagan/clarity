@@ -15,8 +15,10 @@ export function ChatInterface() {
       {/* Chat History Panel */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200">
-          <Input type="text" placeholder="Search conversations" className="w-full" 
-                 icon={<Search className="h-4 w-4 text-gray-500" />} />
+          <div className="relative">
+            <Input type="text" placeholder="Search conversations" className="w-full pl-10" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          </div>
         </div>
         <ScrollArea className="flex-grow">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -73,13 +75,13 @@ export function ChatInterface() {
           </div>
           <div className="flex justify-end">
             <div className="bg-white rounded-lg p-3 max-w-[70%] shadow">
-              <p>I have a question about our company's vacation policy.</p>
+              <p>I have a question about our companys vacation policy.</p>
               <div className="text-xs text-gray-500 mt-1">10:01 AM</div>
             </div>
           </div>
           <div className="flex justify-start">
             <div className="bg-yellow-100 rounded-lg p-3 max-w-[70%]">
-              <p>Of course! I'd be happy to help you with information about our vacation policy. What specific aspect would you like to know more about?</p>
+              <p>Of course! Id be happy to help you with information about our vacation policy. What specific aspect would you like to know more about?</p>
               <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
                 <span>10:02 AM</span>
                 <Smile className="h-4 w-4 text-yellow-500" />

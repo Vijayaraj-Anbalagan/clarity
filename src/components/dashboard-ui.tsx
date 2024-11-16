@@ -279,7 +279,7 @@ export function DashboardUi() {
                       <ul className="list-disc list-inside text-gray-400">
                         <li>Employee engagement has increased by 15% in the last quarter</li>
                         <li>The marketing department shows the highest satisfaction scores</li>
-                        <li>There's a correlation between flexible work hours and productivity</li>
+                        <li>Theres a correlation between flexible work hours and productivity</li>
                       </ul>
                     </div>
                   </div>
