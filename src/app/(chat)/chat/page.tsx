@@ -1,10 +1,14 @@
+'use client';
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MetricControlDialogWithToggle } from "@/components/metricControl";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {  Mic, Paperclip, Send, Heart, Smile, ChevronLeft, User } from 'lucide-react';
+import { Mic, Paperclip, Send, Heart, Smile, ChevronLeft, User } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
 const sampleQueries = [
   {
     id: 1,
@@ -56,10 +60,13 @@ const sampleQueries = [
   },
 ];
 
-
-
-
 export default function ChatInterface() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: '/login' });
+  };
+
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Chat History Panel */}
@@ -69,20 +76,19 @@ export default function ChatInterface() {
             type="text"
             placeholder="Search conversations"
             className="w-full bg-stone-900 text-white border-stone-700 placeholder-gray-400 focus:ring-yellow-400 focus:border-yellow-400"
-           
           />
         </div>
         <ScrollArea className="flex-grow">
-        {sampleQueries.map((query) => (
-  <div
-    key={query.id}
-    className="p-4 border-b border-stone-800 hover:bg-stone-900 cursor-pointer transition-colors duration-200"
-  >
-    <div className="font-semibold text-white">{query.title}</div>
-    <div className="text-sm text-gray-500">{query.snippet}</div>
-    <div className="text-xs text-gray-600 mt-1">{query.date}</div>
-  </div>
-))}
+          {sampleQueries.map((query) => (
+            <div
+              key={query.id}
+              className="p-4 border-b border-stone-800 hover:bg-stone-900 cursor-pointer transition-colors duration-200"
+            >
+              <div className="font-semibold text-white">{query.title}</div>
+              <div className="text-sm text-gray-500">{query.snippet}</div>
+              <div className="text-xs text-gray-600 mt-1">{query.date}</div>
+            </div>
+          ))}
         </ScrollArea>
       </div>
 
@@ -97,7 +103,7 @@ export default function ChatInterface() {
             <h1 className="text-2xl font-bold text-yellow-400">Clarity</h1>
           </div>
           <div className="flex items-center space-x-4">
-          <MetricControlDialogWithToggle />
+            <MetricControlDialogWithToggle />
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -107,7 +113,7 @@ export default function ChatInterface() {
               <PopoverContent className="w-48 bg-stone-900 border border-stone-700 text-white">
                 <div className="space-y-2">
                   <Button variant="ghost" className="w-full justify-start text-white hover:bg-stone-800">Account Settings</Button>
-                  <Button variant="ghost" className="w-full justify-start text-white hover:bg-stone-800">Logout</Button>
+                  <Button variant="ghost" onClick={handleLogout} className="w-full justify-start text-white hover:bg-stone-800">Logout</Button>
                 </div>
               </PopoverContent>
             </Popover>
