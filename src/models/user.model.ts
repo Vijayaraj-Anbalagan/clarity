@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   phoneNo: string;
   password: string;
+  role: string;
   isVerified: boolean;
   verifyToken: string;
   verifyTokenExpire: Date;
@@ -31,6 +32,11 @@ const UserSchema: Schema<IUser> = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
   isVerified: {
     type: Boolean,
     default: false,
@@ -41,6 +47,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema({
   verifyTokenExpire: {
     type: Date,
   },
+  
 });
 
 UserSchema.methods.getVerificationToken = function (): string {
