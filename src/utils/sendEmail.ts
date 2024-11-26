@@ -1,5 +1,16 @@
-import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'aswinsundhar19@gmail.com',
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export const sendEmail = async (
   userEmail: string,
@@ -7,27 +18,19 @@ export const sendEmail = async (
   message: string
 ) => {
   try {
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    } as nodemailer.TransportOptions);
-
-    const mailOptions = {
-      from: process.env.SMTP_FROM_EMAIL,
+    const emailData = {
+      from: 'aswinsundhar19@gmail.com',
       to: userEmail,
       subject,
       html: message,
     };
 
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail(emailData);
   } catch (error) {
+    console.log('Error in Sending', error);
     return NextResponse.json(
       {
-        message: "Something went wrong" + error,
+        message: 'Something went wrong' + error,
       },
       {
         status: 500,

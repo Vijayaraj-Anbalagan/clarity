@@ -17,6 +17,7 @@ const VerifyEmailContent = () => {
   const verifyToken = searchParams.get('verifyToken');
   const id = searchParams.get('id');
 
+  console.log(verifyToken, id);
   const initialized = React.useRef(false);
 
   useEffect(() => {
