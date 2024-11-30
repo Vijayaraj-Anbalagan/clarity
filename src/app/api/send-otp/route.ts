@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: 'aswinsundhar19@gmail.com',
+    user: process.env.SMTP_FROM_EMAIL,
     pass: process.env.SMTP_PASSWORD,
   },
 });
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
     await dbConnect();
     const { email } = await request.json();
 
-    console.log(email)
+    console.log(email);
     if (!email) {
       return NextResponse.json(
         { message: 'Email is required' },
