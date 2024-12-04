@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -12,18 +12,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast"
-
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const { toast } = useToast();
   const router = useRouter();
 
@@ -32,25 +31,25 @@ const Login = () => {
 
     if (!email || !password) {
       setLoading(false);
-      return toast({ variant: "destructive", title: "Please fill all fields" });
+      return toast({ variant: 'destructive', title: 'Please fill all fields' });
     }
 
-    if( email === "head@clarity.com" && password === "admin123" ) {
-      router.replace("/admin");
+    if (email === 'head@clarity.com' && password === 'admin123') {
+      router.replace('/admin');
     }
 
-    const result = await signIn("credentials", {
-      redirect: false,
+    const result = await axios.post('/api/login', {
       email,
       password,
     });
 
     setLoading(false);
 
-    if (result?.error) {
-      toast({ variant: "destructive", title: result.error });
+    console.log(result.status);
+    if (result.status === 200) {
+      router.replace('/chat');
     } else {
-      router.replace("/chat");
+      toast({ variant: 'destructive', title: result.data });
     }
   };
 
@@ -66,7 +65,12 @@ const Login = () => {
         </CardHeader>
         <CardContent className="relative space-y-4 px-6 py-8">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-200">Email</Label>
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-200"
+            >
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
@@ -78,11 +82,16 @@ const Login = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-gray-200">Password</Label>
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-200"
+            >
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -119,7 +128,7 @@ const Login = () => {
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
         </CardFooter>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"></div>

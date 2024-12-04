@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -20,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
 const sampleQueries = [
@@ -53,8 +53,12 @@ export default function ChatInterface() {
   const [chatSessions, setChatSessions] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>('user123');
   const [isEmpathyMode, setisEmpathyMode] = useState(false);
-  const handleLogout = () => {
-    signOut({ callbackUrl: '/login' });
+  const handleLogout = async () => {
+    try {
+      await axios.get('api/logout');
+    } catch (error: any) {
+      console.error(error);
+    }
   };
   const [sessionId, setSessionId] = useState<string | null>(null); // Store session ID
 
@@ -116,9 +120,9 @@ export default function ChatInterface() {
     }
   };
 
-  useEffect(() => {
-    fetchChatSessions();
-  }, []);
+  // useEffect(() => {
+  //   fetchChatSessions();
+  // }, []);
 
   const fetchChatSessions = async () => {
     try {
