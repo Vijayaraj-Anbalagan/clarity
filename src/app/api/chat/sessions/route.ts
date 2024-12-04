@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import ChatSessionModel from '../../../../models/chat.model'; // Import the model
+import { cookiesParse } from '@/utils/cookies';
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get('userId'); // Optionally filter by userId
+    const user = await cookiesParse(req);
+    const userId = user?._id;
 
     let sessions;
     if (userId) {

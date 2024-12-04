@@ -27,10 +27,9 @@ export const cookiesParse = async (request: NextRequest) => {
   const refreshToken = request.cookies.get('refreshToken')?.value;
   console.log('Ref', refreshToken);
 
-  console.log('before');
   try {
     await dbConnect();
-    console.log('After');
+
     if (accessToken) {
       const { payload } = verifyJWT(accessToken);
       console.log('Normal', payload);
@@ -62,7 +61,7 @@ export const cookiesParse = async (request: NextRequest) => {
     }
     return tokenUser;
   } catch (error) {
-    console.log('Send COok',error);
+    console.log('Send COok', error);
     return false;
   }
 };

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,28 +10,29 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phoneNo, setPhoneNo] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phoneNo, setPhoneNo] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const { toast } = useToast();
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/register", {
-        method: "POST",
+      const response = await fetch('/api/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name,
@@ -44,27 +45,28 @@ const Register = () => {
       if (response.ok) {
         setLoading(false);
         toast({
-          title: "Account Created Successfully!",
-          description: "Welcome aboard! You can now log in.",
-          variant: "default",
+          title: 'Account Created Successfully!',
+          description: 'Welcome aboard! You can now log in.',
+          variant: 'default',
         });
-        console.log("Registration successful");
+        router.replace('/chat');
+        console.log('Registration successful');
       } else {
-        console.log("Registration failed", response);
+        console.log('Registration failed', response);
         setLoading(false);
         toast({
-          title: "Registration Failed",
-          description: "Please check your information and try again.",
-          variant: "destructive",
+          title: 'Registration Failed',
+          description: 'Please check your information and try again.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       setLoading(false);
       toast({
-        title: "An Error Occurred",
-        description: "Please try again later.",
-        variant: "destructive",
+        title: 'An Error Occurred',
+        description: 'Please try again later.',
+        variant: 'destructive',
       });
     }
   };
@@ -74,14 +76,18 @@ const Register = () => {
       <Card className="w-full max-w-md overflow-hidden bg-black text-white shadow-2xl">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <CardHeader className="relative space-y-1 border-b border-gray-800 px-6 pb-6 pt-8">
-          <CardTitle className="text-3xl font-bold">Create Your Account</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            Create Your Account
+          </CardTitle>
           <CardDescription className="text-gray-400">
             Join us today and start your journey
           </CardDescription>
         </CardHeader>
         <CardContent className="relative space-y-4 px-6 py-8">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-200">Full Name</Label>
+            <Label htmlFor="name" className="text-sm font-medium text-gray-200">
+              Full Name
+            </Label>
             <Input
               id="name"
               type="text"
@@ -93,7 +99,12 @@ const Register = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-200">Email Address</Label>
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-200"
+            >
+              Email Address
+            </Label>
             <Input
               id="email"
               type="email"
@@ -105,7 +116,12 @@ const Register = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phoneNo" className="text-sm font-medium text-gray-200">Phone Number</Label>
+            <Label
+              htmlFor="phoneNo"
+              className="text-sm font-medium text-gray-200"
+            >
+              Phone Number
+            </Label>
             <Input
               id="phoneNo"
               type="tel"
@@ -117,11 +133,16 @@ const Register = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-gray-200">Password</Label>
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-200"
+            >
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -143,12 +164,10 @@ const Register = () => {
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? "Creating Your Account..." : "Register Now"}
+            {loading ? 'Creating Your Account...' : 'Register Now'}
           </Button>
         </CardFooter>
-        
       </Card>
-      
     </div>
   );
 };

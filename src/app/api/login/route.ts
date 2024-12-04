@@ -13,23 +13,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     await dbConnect();
 
+
     // Validate input
     if (!email || !password) {
-      throw Error('Must provide both email and password');
+      return NextResponse.json(
+        {
+          error: 'Must provide both email and password',
+        },
+        {
+          status: 400,
+        }
+      );
     }
 
     // Find user in the database
-    const user = await userModel.findOne({ email }).select(
-      '_id name email password'
-    );
+    const user = await userModel
+      .findOne({ email })
+      .select('_id name email password');
     if (!user) {
       throw Error('User not found');
     }
 
     // Verify password
     const isPasswordMatch = await user.comparePassword(password);
+    console.log(isPasswordMatch)
     if (!isPasswordMatch) {
-      throw new Error('Invalid credentials');
+      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
     // Generate a unique refresh token
