@@ -1,14 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import ChatSessionModel from '../../../../models/chat.model';
 import { dbConnect } from '@/config/dbConnect';
+import { cookiesParse } from '@/utils/cookies';
 
-export async function POST(req: Request) {
+export async function GET(req: NextRequest) {
   try {
     await dbConnect();
-    const { userId }: { userId: string } = await req.json();
+    const user = await cookiesParse(req);
 
-    if (!userId) {
+    if (!user?._id) {
       throw new Error('User ID is required to start a session');
     }
 
@@ -17,8 +18,8 @@ export async function POST(req: Request) {
 
     // Create a new chat session
     const newChatSession = new ChatSessionModel({
-      userId,
-      sessionName: 'New Session1',
+      userId: user._id,
+      sessionName: 'New Session 1',
       sessionId,
       messages: [],
     });
