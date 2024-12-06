@@ -81,24 +81,57 @@ async function performLLM(userPrompt: string): Promise<string> {
   }
 }
 
-// Router function to determine if RAG or LLM is needed
-function router(state: typeof StateAnnotation.State) {
+// Router function to determine if RAG or LLM is needed using LLM call
+async function router(state: typeof StateAnnotation.State): Promise<string> {
   const query = String(state.messages[state.messages.length - 1]?.content || "");
   console.log("Query:", query);
 
-  if (
-    query.toLowerCase().includes("hr") ||
-    query.toLowerCase().includes("policy") ||
-    query.toLowerCase().includes("event") ||
-    query.toLowerCase().includes("it support") ||
-    query.toLowerCase().includes("legal")
-  ) {
-    console.log("Routing to RAG");
-    return "RAG";
+  try {
+    const classificationPrompt = `
+      User query: "${query}"
+      Your task is to classify the given user query into one of the following categories if query related to organizational matters such as anything related to organizational matters : [Organisation, Not Related to Organisation].
+      If you find the query is not related to organisational matters but also partially related to organisational matters , please classify it as 'Organisation'.
+      Please remember that 'Organistional matters' meaning anything related to HR policies, IT support, company events, and legal information and not about general or public information.
+      Only respond with the category name and the reason for opting that category as the following format of json.
+      {
+        "category": "Category_name",
+        "reason": "The reason for opting that category."
+      }
+
+       Examples of 'Organisation' queries:
+      - "What is the privacy policy of our company?"
+      - "How do I access the HR portal?"
+      - "Tell me about the upcoming company event."
+      - "What are the IT support hours?"
+      - "What is the process for submitting a leave request?"
+      - "How do I report a security incident?"
+      - "What is the procedure for booking a conference room?"
+      - "How do I access the company handbook?"
+      
+      Examples of 'Not Related to Organisation' queries:
+      - "What is the weather today?"
+      - "Tell me a joke."
+      - "What is the capital of France?"
+      - "What is the latest movie in theaters?"
+      - "What is the best restaurant in town?"
+    `;
+
+    const classificationResponse = await performLLM(classificationPrompt);
+    console.log("Classification Response:", classificationResponse);
+
+    const classificationResult = JSON.parse(classificationResponse);
+    if (classificationResult.category.trim().toLowerCase() === "organisation") {
+      console.log("Routing to RAG");
+      return "RAG";
+    }
+  } catch (error) {
+    console.error("Error in router classification:", error);
   }
+
   console.log("Routing to LLM");
   return "LLM";
 }
+
 
 // Workflow nodes
 async function callRAG(state: typeof StateAnnotation.State) {
