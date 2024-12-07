@@ -1,8 +1,7 @@
 const axios = require('axios');
 const fs = require('fs');
 const FormDataLib = require('form-data');
-const { ChromaClient } = require('chromadb');
-
+// const { ChromaClient } = require('chromadb');
 
 async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
   try {
@@ -114,7 +113,17 @@ async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
 
     // Insert data into ChromaDB
     const collection = await client.createCollection({
-      name: 'company_handbook24',
+      name: 'company_handbook2',
+      createIfMissing: true,
+      index: {
+        type: 'hnsw', // Set the index type to HNSW
+        params: {
+          // M: Number of neighbors for each node
+          M: 12, // Smaller values speed up search but reduce accuracy
+          efConstruction: 180, // Controls the speed of index construction (higher = slower)
+          efSearch: 100, // Controls the search accuracy (higher = more accurate but slower)
+        },
+      },
     });
 
     // Loop through pages and extract ids, metadata, and documents
@@ -180,7 +189,7 @@ async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
 }
 
 // Usage
-const pdfFilePath = './StratoSenseHR.pdf'; // Path to your PDF file
+const pdfFilePath = './hr.pdf'; // Path to your PDF file
 
 const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR'; // Your API key
 
