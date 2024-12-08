@@ -212,7 +212,7 @@ const Login = () => {
               Enter OTP
             </h2>
             <p className="text-black text-center">
-              We've sent a one-time password to your email.
+              Weve sent a one-time password to your email.
             </p>
             <div className="space-y-2">
               <Label htmlFor="otp" className="text-black">
@@ -240,7 +240,7 @@ const Login = () => {
             <Button
               onClick={handleOTPSubmit}
               disabled={loading}
-              className="w-full bg-black text-yellow-400 hover:bg-gray-800"
+              className=" w-full bg-black text-yellow-400 hover:bg-gray-800 "
             >
               {loading ? 'Verifying...' : 'Submit OTP'}
             </Button>

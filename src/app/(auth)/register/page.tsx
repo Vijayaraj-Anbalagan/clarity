@@ -20,6 +20,8 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phoneNo, setPhoneNo] = useState('');
+  const [department, setDepartment] = useState('');
+  const [designation, setDesignation] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -39,6 +41,8 @@ const Register = () => {
           email,
           password,
           phoneNo,
+          department,
+          designation,
         }),
       });
 
@@ -49,7 +53,7 @@ const Register = () => {
           description: 'Welcome aboard! You can now log in.',
           variant: 'default',
         });
-        router.replace('/chat');
+        router.replace('/check-email');
         console.log('Registration successful');
       } else {
         console.log('Registration failed', response);
@@ -129,6 +133,40 @@ const Register = () => {
               required
               value={phoneNo}
               onChange={(e) => setPhoneNo(e.target.value)}
+              className="border-gray-700 bg-white text-black placeholder:text-gray-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="department"
+              className="text-sm font-medium text-gray-200"
+            >
+              Department
+            </Label>
+            <Input
+              id="department"
+              type="text"
+              placeholder="Engineering"
+              required
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="border-gray-700 bg-white text-black placeholder:text-gray-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="designation"
+              className="text-sm font-medium text-gray-200"
+            >
+              Designation
+            </Label>
+            <Input
+              id="designation"
+              type="text"
+              placeholder="Software Engineer"
+              required
+              value={designation}
+              onChange={(e) => setDesignation(e.target.value)}
               className="border-gray-700 bg-white text-black placeholder:text-gray-500"
             />
           </div>
