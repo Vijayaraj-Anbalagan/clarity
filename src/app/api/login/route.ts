@@ -13,7 +13,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     await dbConnect();
 
-
     // Validate input
     if (!email || !password) {
       return NextResponse.json(
@@ -29,21 +28,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Find user in the database
     const user = await userModel
       .findOne({ email })
-      .select('_id name email password');
+      .select('_id name email password isOtpVerified');
     if (!user) {
       throw Error('User not found');
     }
 
     // Verify password
     const isPasswordMatch = await user.comparePassword(password);
-    console.log(isPasswordMatch)
+    console.log(isPasswordMatch);
     if (!isPasswordMatch) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
     // Generate a unique refresh token
+    console.log('user', user);
+    console.log('Otp', user.isOtpVerified);
+    if (user.isOtpVerified) {
+      return NextResponse.json({ otpReq: true }, { status: 200 });
+    }
     const cryptoRefToken = crypto.randomBytes(40).toString('hex');
-
     // Create a refresh token in the database
     const refToken = await Token.create({
       refreshToken: cryptoRefToken,
@@ -60,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     sendCookies(user, refreshTokenUser);
 
     // Respond with the user details
-    return NextResponse.json({ user }, { status: 200 });
+    return NextResponse.json({ otpReq: true }, { status: 200 });
   } catch (error: any) {
     // Handle errors appropriately
     return NextResponse.json(

@@ -1,9 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
 const FormDataLib = require('form-data');
-// const { ChromaClient } = require('chromadb');
+const { ChromaClient } = require('chromadb');
 
-async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
+export async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
   try {
     // Step 1: Upload PDF for parsing
     const form = new FormDataLib();

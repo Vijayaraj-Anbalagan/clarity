@@ -2,13 +2,13 @@ import { dbConnect } from '@/config/dbConnect';
 import User from '@/models/user.model';
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-
-
+import { sendCookies } from '@/utils/cookies';
+import Token from '@/models/token.model';
 
 export async function POST(request: Request) {
   try {
     await dbConnect();
-    const { email, otp } = await request.json();
+    const { email, otp, type } = await request.json();
 
     if (!email || !otp) {
       return NextResponse.json(
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
     // Check OTP validity
     if (
       user.otpVerifyToken !== hashedOtp ||
+      !user.otpVerifyTokenExpire ||
       user.otpVerifyTokenExpire < new Date()
     ) {
       return NextResponse.json(
@@ -42,6 +43,23 @@ export async function POST(request: Request) {
     user.otpVerifyTokenExpire = undefined;
     await user.save();
 
+    if (type === 'verify') {
+      const cryptoRefToken = crypto.randomBytes(40).toString('hex');
+      // Create a refresh token in the database
+      const refToken = await Token.create({
+        refreshToken: cryptoRefToken,
+        user: user._id,
+      });
+
+      // Destructure refreshToken and userId for cookies
+      const refreshTokenUser = {
+        refreshToken: refToken.refreshToken,
+        user: refToken.user.toString(),
+      };
+
+      // Send cookies
+      sendCookies(user, refreshTokenUser);
+    }
     return NextResponse.json(
       { message: 'OTP verified successfully' },
       { status: 200 }

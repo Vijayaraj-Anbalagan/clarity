@@ -23,9 +23,7 @@ export const sendCookies = (
 
 export const cookiesParse = async (request: NextRequest) => {
   const accessToken = request.cookies.get('accessToken')?.value;
-  console.log('access', accessToken);
   const refreshToken = request.cookies.get('refreshToken')?.value;
-  console.log('Ref', refreshToken);
 
   try {
     await dbConnect();
