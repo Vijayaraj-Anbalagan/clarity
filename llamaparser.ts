@@ -1,9 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
 const FormDataLib = require('form-data');
-const { ChromaClient } = require('chromadb');
+const { ChromaClient : MyCromaClient } = require('chromadb');
 
-export async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
+async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
   try {
     // Step 1: Upload PDF for parsing
     const form = new FormDataLib();
@@ -109,11 +109,11 @@ export async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string
 
     const pages = resultResponse.data.pages;
 
-    const client = new ChromaClient({ path: 'http://13.201.136.8:8000' });
+    const client = new MyCromaClient({ path: 'http://13.201.48.35:8000' });
 
     // Insert data into ChromaDB
     const collection = await client.createCollection({
-      name: 'company_handbook2',
+      name: 'company_handbooknew',
       createIfMissing: true,
       index: {
         type: 'hnsw', // Set the index type to HNSW

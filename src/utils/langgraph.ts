@@ -1,11 +1,20 @@
-import { BaseMessage, AIMessage, HumanMessage } from "@langchain/core/messages";
-import { StateGraph } from "@langchain/langgraph";
-import { MemorySaver, Annotation } from "@langchain/langgraph";
-import Groq from "groq-sdk";
+import { BaseMessage, AIMessage, HumanMessage } from '@langchain/core/messages';
+import { StateGraph } from '@langchain/langgraph';
+import { MemorySaver, Annotation } from '@langchain/langgraph';
+import Groq from 'groq-sdk';
+import { io } from 'socket.io-client';
 
 // Initialize Groq
 const groq = new Groq();
+const socket = io('http://localhost:5000');
 
+socket.on('connect', () => {
+  console.log('Connected to the server.');
+});
+
+socket.on('disconnect', () => {
+  console.log('Disconnected from the server.');
+});
 // Define the state for LangGraph
 const StateAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
@@ -15,11 +24,12 @@ const StateAnnotation = Annotation.Root({
 
 // Function to perform a RAG workflow
 async function performRAG(userPrompt: string): Promise<string> {
+  console.log('Query form socket', userPrompt);
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
-          role: "system",
+          role: 'system',
           content: `
 You are Clarity, an intelligent enterprise assistant chatbot designed for organizational use.
 Your primary role is to provide precise, professional, and actionable responses to user queries related to HR policies, IT support, company events, and legal information.
@@ -35,11 +45,11 @@ Guidelines:
           `,
         },
         {
-          role: "user",
+          role: 'user',
           content: userPrompt,
         },
       ],
-      model: "llama-3.2-1b-preview",
+      model: 'llama-3.2-1b-preview',
       temperature: 0.55,
       max_tokens: 8192,
       top_p: 0.88,
@@ -47,11 +57,11 @@ Guidelines:
       stop: null,
     });
 
-    const response = chatCompletion.choices[0]?.message?.content || "";
+    const response = chatCompletion.choices[0]?.message?.content || '';
     return response;
   } catch (error) {
-    console.error("Error performing RAG:", error);
-    return "An error occurred while generating a response.";
+    console.error('Error performing RAG:', error);
+    return 'An error occurred while generating a response.';
   }
 }
 
@@ -61,11 +71,11 @@ async function performLLM(userPrompt: string): Promise<string> {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: userPrompt,
         },
       ],
-      model: "llama-3.2-1b-preview",
+      model: 'llama-3.2-1b-preview',
       temperature: 0.7,
       max_tokens: 8192,
       top_p: 0.9,
@@ -73,18 +83,20 @@ async function performLLM(userPrompt: string): Promise<string> {
       stop: null,
     });
 
-    const response = chatCompletion.choices[0]?.message?.content || "";
+    const response = chatCompletion.choices[0]?.message?.content || '';
     return response;
   } catch (error) {
-    console.error("Error running LLM:", error);
-    return "An error occurred while generating a response.";
+    console.error('Error running LLM:', error);
+    return 'An error occurred while generating a response.';
   }
 }
 
 // Router function to determine if RAG or LLM is needed using LLM call
 async function router(state: typeof StateAnnotation.State): Promise<string> {
-  const query = String(state.messages[state.messages.length - 1]?.content || "");
-  console.log("Query:", query);
+  const query = String(
+    state.messages[state.messages.length - 1]?.content || ''
+  );
+  console.log('Query', query);
 
   try {
     const classificationPrompt = `
@@ -117,32 +129,42 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
     `;
 
     const classificationResponse = await performLLM(classificationPrompt);
-    console.log("Classification Response:", classificationResponse);
+    console.log('Classification Response:', classificationResponse);
 
     const classificationResult = JSON.parse(classificationResponse);
-    if (classificationResult.category.trim().toLowerCase() === "organisation") {
-      console.log("Routing to RAG");
-      return "RAG";
+    if (classificationResult.category.trim().toLowerCase() === 'organisation') {
+      console.log('Routing to RAG');
+      return 'RAG';
     }
   } catch (error) {
-    console.error("Error in router classification:", error);
+    console.error('Error in router classification:', error);
   }
 
-  console.log("Routing to LLM");
-  return "LLM";
+  console.log('Routing to LLM');
+  return 'LLM';
 }
-
 
 // Workflow nodes
 async function callRAG(state: typeof StateAnnotation.State) {
-  const query = String(state.messages[state.messages.length - 1]?.content || "");
-  const response = await performRAG(query);
+  console.log('Hel');
+  const query = String(
+    state.messages[state.messages.length - 1]?.content || ''
+  );
+  let response = '';
+  socket.on('queryResponse', async (data) => {
+    console.log('dat1',data);
+    response = await performRAG(data.response);
+  });
+
+  console.log('Response in FE', response);
   state.messages.push(new AIMessage(response));
   return state;
 }
 
 async function callLLM(state: typeof StateAnnotation.State) {
-  const query = String(state.messages[state.messages.length - 1]?.content || "");
+  const query = String(
+    state.messages[state.messages.length - 1]?.content || ''
+  );
   const response = await performLLM(query);
   state.messages.push(new AIMessage(response));
   return state;
@@ -150,14 +172,14 @@ async function callLLM(state: typeof StateAnnotation.State) {
 
 // Define the graph
 const workflow = new StateGraph(StateAnnotation)
-  .addNode("RAG", callRAG)
-  .addNode("LLM", callLLM)
-  .addEdge("__start__", "LLM")
-  .addConditionalEdges("LLM", router, {
-    RAG: "RAG",
-    LLM: "__end__",
+  .addNode('RAG', callRAG)
+  .addNode('LLM', callLLM)
+  .addEdge('__start__', 'LLM')
+  .addConditionalEdges('LLM', router, {
+    RAG: 'RAG',
+    LLM: '__end__',
   })
-  .addEdge("RAG", "__end__");
+  .addEdge('RAG', '__end__');
 
 // Initialize memory to persist state
 const checkpointer = new MemorySaver();
