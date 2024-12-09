@@ -146,18 +146,39 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
 
 // Workflow nodes
 async function callRAG(state: typeof StateAnnotation.State) {
-  console.log('Hel');
-  const query = String(
-    state.messages[state.messages.length - 1]?.content || ''
-  );
-  let response = '';
-  socket.on('queryResponse', async (data) => {
-    console.log('dat1',data);
-    response = await performRAG(data.response);
-  });
+  console.log('callRAG');
 
-  console.log('Response in FE', response);
-  state.messages.push(new AIMessage(response));
+  let response = '';
+  let queryResponse = '';
+
+  // Emit classification flag to the backend
+  socket.emit('classificationFlag', { flag: true });
+
+  try {
+    // Wait for the backend to emit queryResponse
+    queryResponse = await new Promise((resolve, reject) => {
+      socket.once('queryResponse', (data) => {
+        console.log('Received queryResponse from backend:', data.response);
+        resolve(data.response); // Resolve with the backend response
+      });
+
+      // Optional timeout to avoid indefinite waiting
+      // setTimeout(() => reject(new Error('QueryResponse timeout')), 10000); // 10 seconds
+    });
+
+    // Perform RAG using the received query response
+    if (queryResponse) {
+      response = await performRAG(queryResponse);
+    }
+
+    console.log('Final Response in Frontend:', response);
+
+    // Update state with the AI response
+    state.messages.push(new AIMessage(response));
+  } catch (error: any) {
+    console.error('Error in callRAG:', error.message);
+  }
+
   return state;
 }
 
