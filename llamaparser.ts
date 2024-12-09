@@ -3,11 +3,15 @@ const fs = require('fs');
 const FormDataLib = require('form-data');
 const { ChromaClient : MyCromaClient } = require('chromadb');
 
-async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
+async function parseAndFetchPDFResult(inputUrlOrS3Path: string, apiKey: string) {
   try {
     // Step 1: Upload PDF for parsing
     const form = new FormDataLib();
-    form.append('file', fs.createReadStream(pdfFilePath)); // Add the PDF file
+    if (inputUrlOrS3Path.startsWith("s3://")) {
+      form.append("input_s3_path", inputUrlOrS3Path); // Use S3 path
+    } else {
+      form.append("input_url", inputUrlOrS3Path); // Use URL
+    }
     form.append('is_formatting_instruction', 'true'); // Enable formatting instructions
     form.append(
       'parsing_instruction',
@@ -189,8 +193,8 @@ async function parseAndFetchPDFResult(pdfFilePath: string, apiKey: string) {
 }
 
 // Usage
-const pdfFilePath = './hr.pdf'; // Path to your PDF file
+const s3Path = "https://claritydatasih.s3.ap-south-1.amazonaws.com/uploads/1733712638739-Team%20Ignite%20with%20Mentor.pdf"; // S3 path
 
 const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR'; // Your API key
 
-parseAndFetchPDFResult(pdfFilePath, apiKey);
+parseAndFetchPDFResult( s3Path, apiKey);

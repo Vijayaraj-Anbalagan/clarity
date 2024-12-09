@@ -67,20 +67,40 @@ const sampleFiles = [
 export default function DashboardUI() {
   const [activeTab, setActiveTab] = useState('overview'); // State for managing active tab
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
 
-  // Function to handle button click and trigger file input
-  const handleUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
     }
   };
 
-  // Function to handle file selection
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      // Handle the file upload process
-      console.log("Selected file:", files[0].name);
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('/api/pdftemp', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setUploadStatus('File uploaded successfully.');
+        setFileUrl(data.fileUrl);
+      } else {
+        setUploadStatus(data.error);
+      }
+    } catch (error) {
+      setUploadStatus('An error occurred while uploading the file.');
     }
   };
 
@@ -255,16 +275,14 @@ export default function DashboardUI() {
                   <div>
                   <Button
         className="bg-yellow-400 hover:bg-yellow-500 text-black"
-        onClick={handleUploadClick}
+        onClick={handleUpload} disabled={!selectedFile}
       >
         <Upload className="h-4 w-4 mr-2" />
         Upload File
       </Button>
       <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
         style={{ display: "none" }} // Hide the input
+        type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} 
       />
       </div>
                 </CardHeader>
