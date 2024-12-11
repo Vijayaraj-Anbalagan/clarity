@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect ,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,9 +16,10 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { TypeAnimation } from 'react-type-animation';
-
+import { io } from 'socket.io-client';
 
 export default function ChatInterface() {
+  const socket = io('https://80a7-117-96-40-60.ngrok-free.app');
   const router = useRouter();
   const [inputValue, setInputValue] = useState('');
   const [chatHistory, setChatHistory] = useState<
@@ -30,6 +31,7 @@ export default function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const scrollToBottom = () => {
     if (chatEndRef.current) {
@@ -40,8 +42,7 @@ export default function ChatInterface() {
   useEffect(() => {
     scrollToBottom();
   }, [chatHistory]);
-  
-  
+
   const handleLogout = async () => {
     try {
       await axios.get('api/logout');
@@ -50,8 +51,21 @@ export default function ChatInterface() {
       console.error(error);
     }
   };
+  useEffect(() => {
+    // Notify server about user session
+    socket.emit('userSession', userId);
+
+    // Listen for chat responses from the server
+    socket.on('chatResponse', (data) => {
+      
+    });
+
+    return () => {
+      socket.off('chatResponse');
+    };
+  }, [userId]);
+
   const [sessionId, setSessionId] = useState<string | null>(null); // Store session ID
-  
 
   const startNewChat = async () => {
     setChatHistory([]);
@@ -65,6 +79,8 @@ export default function ChatInterface() {
         console.error('Error starting new chat:', error);
       });
   };
+
+  useEffect(() => {}, [userId]);
 
   // const sendMessageToAPI = async (query: string) => {
   //   setChatHistory((prevChatHistory) => [
@@ -196,9 +212,11 @@ export default function ChatInterface() {
   const fetchChatSessions = async () => {
     try {
       const response = await axios.get(`/api/chat/sessions`);
-
+      const user = await axios.get('/api/getCurrentUser');
+      console.log('userid', user.data.user._id);
       setChatSessions(response.data.sessions);
       setChatHistory(response.data.sessions[0].messages);
+      setUserId(user.data.user._id);
     } catch (error) {
       console.error('Error fetching chat sessions:', error);
     }
@@ -422,9 +440,7 @@ export default function ChatInterface() {
             </p>
             <ul className="list-disc list-inside mt-3 text-sm text-gray-400">
               <li>Type Tell me about the companys policy to learn more.</li>
-              <li>
-                Ask What are the common team rules? for team guidelines.
-              </li>
+              <li>Ask What are the common team rules? for team guidelines.</li>
               <li>
                 Say Help me with project ideas for brainstorming assistance.
               </li>
@@ -434,47 +450,47 @@ export default function ChatInterface() {
             </p>
           </div>
           {chatHistory.map((chat, index) => (
-  <div
-    key={index}
-    className={`flex mb-3 ${
-      chat.role === 'user' ? 'justify-end' : 'justify-start'
-    }`}
-  >
-    <div
-      className={`max-w-[75%] p-3 rounded-lg shadow-md ${
-        chat.role === 'user'
-          ? isEmpathyMode
-            ? 'bg-[#FFB6C1] text-[#6D214F]'
-            : 'bg-yellow-600 text-black'
-          : isEmpathyMode
-          ? 'bg-[#F4A7B9] text-[#4A4A4A]'
-          : 'bg-stone-800 text-white'
-      }`}
-    >
-      {chat.role === 'model' && index === chatHistory.length - 1 ? (
-        <TypeAnimation
-          sequence={[
-            chat.message, // Message to type out
-            () => {
-              // Callback to scroll to the bottom after typing
-              scrollToBottom();
-            },
-          ]}
-          speed={50} // Typing speed
-          wrapper="span"
-          repeat={0} // Do not repeat
-        />
-      ) : (
-        <ReactMarkdown
-          // eslint-disable-next-line react/no-children-prop
-          children={chat.message}
-          remarkPlugins={[remarkGfm]}
-          className="prose prose-sm prose-invert"
-        />
-      )}
-    </div>
-  </div>
-))}
+            <div
+              key={index}
+              className={`flex mb-3 ${
+                chat.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
+              <div
+                className={`max-w-[75%] p-3 rounded-lg shadow-md ${
+                  chat.role === 'user'
+                    ? isEmpathyMode
+                      ? 'bg-[#FFB6C1] text-[#6D214F]'
+                      : 'bg-yellow-600 text-black'
+                    : isEmpathyMode
+                    ? 'bg-[#F4A7B9] text-[#4A4A4A]'
+                    : 'bg-stone-800 text-white'
+                }`}
+              >
+                {chat.role === 'model' && index === chatHistory.length - 1 ? (
+                  <TypeAnimation
+                    sequence={[
+                      chat.message, // Message to type out
+                      () => {
+                        // Callback to scroll to the bottom after typing
+                        scrollToBottom();
+                      },
+                    ]}
+                    speed={50} // Typing speed
+                    wrapper="span"
+                    repeat={0} // Do not repeat
+                  />
+                ) : (
+                  <ReactMarkdown
+                    // eslint-disable-next-line react/no-children-prop
+                    children={chat.message}
+                    remarkPlugins={[remarkGfm]}
+                    className="prose prose-sm prose-invert"
+                  />
+                )}
+              </div>
+            </div>
+          ))}
 
           {isLoading && (
             <div className="text-yellow-400 mt-3 animate-pulse">Typing...</div>
@@ -484,33 +500,33 @@ export default function ChatInterface() {
 
         {/* Input Area */}
         <div className="flex items-center space-x-2">
-    <Input
-      type="text"
-      placeholder="Type your message..."
-      value={inputValue}
-      onChange={(e) => setInputValue(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' && !isLoading) {
-          handleSendMessage();
-        }
-      }}
-      className={`flex-grow ${
-        isEmpathyMode
-          ? 'bg-pink-50 text-pink-900 border-pink-300 placeholder-pink-400 focus:ring-pink-400 focus:border-pink-400'
-          : 'bg-stone-900 text-white border border-stone-700 placeholder-gray-500 focus:ring-yellow-400 focus:border-yellow-400'
-      }`}
-    />
-    <Button
-      onClick={handleSendMessage}
-      className={`${
-        isEmpathyMode
-          ? 'bg-[#FFB6C1] hover:bg-[#FF8FAF] text-white'
-          : 'bg-yellow-400 hover:bg-yellow-500 text-black'
-      }`}
-    >
-      <Send className="h-4 w-4" />
-    </Button>
-  </div>
+          <Input
+            type="text"
+            placeholder="Type your message..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !isLoading) {
+                handleSendMessage();
+              }
+            }}
+            className={`flex-grow ${
+              isEmpathyMode
+                ? 'bg-pink-50 text-pink-900 border-pink-300 placeholder-pink-400 focus:ring-pink-400 focus:border-pink-400'
+                : 'bg-stone-900 text-white border border-stone-700 placeholder-gray-500 focus:ring-yellow-400 focus:border-yellow-400'
+            }`}
+          />
+          <Button
+            onClick={handleSendMessage}
+            className={`${
+              isEmpathyMode
+                ? 'bg-[#FFB6C1] hover:bg-[#FF8FAF] text-white'
+                : 'bg-yellow-400 hover:bg-yellow-500 text-black'
+            }`}
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

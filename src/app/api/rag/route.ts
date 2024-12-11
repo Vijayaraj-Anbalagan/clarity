@@ -32,22 +32,18 @@ Guidelines:
 4. Maintain a formal, professional, and concise tone.
 5. Avoid embellishments, unnecessary framing, or speculative details.
 6. Begin directly with actionable information, avoiding phrases like "Based on the context provided" or "The procedure is as follows.
-7. Must give response based only on the context provided below.
-8. Should give response in not more than  3-4 lines.
-
-
-Context: ${context}"
+7. Must give response based only on the context provided below."
           `,
         },
         {
           role: 'user',
-          content: userPrompt,
+          content: "Answer the following query of the user : with respect to the context provided"+userPrompt+"The Context Extracted from the Pdf :"+context,
         },
       ],
       model: 'llama-3.2-1b-preview',
-      temperature: 0.55,
+      temperature: 0.2,
       max_tokens: 8192,
-      top_p: 0.88,
+      top_p: 0.58,
       stream: false,
       stop: null,
     });
@@ -60,24 +56,7 @@ Context: ${context}"
   }
 }
 
-async function fetchStoredData(query: string) {
-  const client = new ChromaClient({ path: 'http://13.201.48.35:8000' });
-  const collection = await client.getOrCreateCollection({
-    name: 'company_handbookevalfin',
-  });
 
-  const storedData = await collection.query({
-    queryTexts: [query],
-    nResults: 3,
-  });
-
-  console.log('Fetched', storedData);
-  return (
-    storedData.documents?.[0]
-      ?.map((text) => text?.replace(/\n/g, ' ').trim())
-      .join('\n') ?? null
-  );
-}
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
 import pdfParse from 'pdf-parse';
 
@@ -13,7 +14,10 @@ export async function POST(req: NextRequest) {
 
     // Validate the uploaded file
     if (!uploadedFile) {
-      return NextResponse.json({ error: 'No valid file uploaded' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'No valid file uploaded' },
+        { status: 400 }
+      );
     }
 
     // Convert the file to a buffer
@@ -31,28 +35,34 @@ export async function POST(req: NextRequest) {
 
       // Adjust end to the next full stop if within bounds
       if (end < parsedText.length) {
-      const nextFullStop = parsedText.indexOf('.', end);
-      if (nextFullStop !== -1 && nextFullStop < end + 300) {
-        end = nextFullStop + 1;
-      } else {
-        // Adjust end to the next whitespace if no full stop found within bounds
-        const nextWhitespace = parsedText.indexOf(' ', end);
-        if (nextWhitespace !== -1) {
-        end = nextWhitespace;
+        const nextFullStop = parsedText.indexOf('.', end);
+        if (nextFullStop !== -1 && nextFullStop < end + 300) {
+          end = nextFullStop + 1;
+        } else {
+          // Adjust end to the next whitespace if no full stop found within bounds
+          const nextWhitespace = parsedText.indexOf(' ', end);
+          if (nextWhitespace !== -1) {
+            end = nextWhitespace;
+          }
         }
-      }
       }
 
       // Adjust end to the next full stop or whitespace if a comma is encountered
       const nextComma = parsedText.indexOf(',', start);
       if (nextComma !== -1 && nextComma < end) {
-      const nextFullStopAfterComma = parsedText.indexOf('.', nextComma);
-      const nextWhitespaceAfterComma = parsedText.indexOf(' ', nextComma);
-      if (nextFullStopAfterComma !== -1 && nextFullStopAfterComma < end + 300) {
-        end = nextFullStopAfterComma + 1;
-      } else if (nextWhitespaceAfterComma !== -1 && nextWhitespaceAfterComma < end + 300) {
-        end = nextWhitespaceAfterComma;
-      }
+        const nextFullStopAfterComma = parsedText.indexOf('.', nextComma);
+        const nextWhitespaceAfterComma = parsedText.indexOf(' ', nextComma);
+        if (
+          nextFullStopAfterComma !== -1 &&
+          nextFullStopAfterComma < end + 300
+        ) {
+          end = nextFullStopAfterComma + 1;
+        } else if (
+          nextWhitespaceAfterComma !== -1 &&
+          nextWhitespaceAfterComma < end + 300
+        ) {
+          end = nextWhitespaceAfterComma;
+        }
       }
 
       chunks.push(parsedText.substring(start, end).trim());
@@ -60,31 +70,42 @@ export async function POST(req: NextRequest) {
     }
 
     // Define an array of bad words to filter out
-    const badWords = ['Only a vacuous', 'quite Moronic', 'Idiotic', 'Ridiculous', 'Brainlessly', 'obfuscated'];
+    const badWords = [
+      'Only a vacuous',
+      'quite Moronic',
+      'Idiotic',
+      'Ridiculous',
+      'Brainlessly',
+      'obfuscated',
+    ];
 
     // Function to filter out bad words from a chunk
     const filterBadWords = (text: string) => {
       badWords.forEach((word, index) => {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      text = text.replace(regex, `FILTERED${index + 1}`);
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        text = text.replace(regex, `FILTERED${index + 1}`);
       });
       return text;
     };
 
     // Filter bad words from each chunk
-    const filteredChunks = chunks.map(chunk => filterBadWords(chunk));
+    const filteredChunks = chunks.map((chunk) => filterBadWords(chunk));
     const documents = filteredChunks; // Array of text chunks
     const ids = (await chunks).map((_: any, index: number) => `id${index + 1}`); // Corresponding IDs
 
-    console.log('PDF successfully parsed and text chunks extracted.',
+    console.log(
+      'PDF successfully parsed and text chunks extracted.',
       documents,
       ids
-
     );
 
-
-
-
+    const pushChroma = axios.post(
+      ' https://80a7-117-96-40-60.ngrok-free.app/parsing',
+      {
+        documents,
+        ids,
+      }
+    );
     // Respond with extracted chunks and IDs
     return NextResponse.json({
       documents,
