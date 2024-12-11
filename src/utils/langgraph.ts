@@ -107,7 +107,7 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
   try {
     const classificationPrompt = `
       User query: "${query}"
-      Your task is to classify the given user query into one of the following categories if query related to organizational matters such as anything related to organizational matters : [Organisation, Not Related to Organisation].
+      Your task is to classify the given user query into one of the following categories this is organisational chatbot so most questions will be based on the organistion so if query related to organizational matters such as anything related to organizational matters : [Organisation, Not Related to Organisation].
       If you find the query is not related to organisational matters but also partially related to organisational matters , please classify it as 'Organisation'.
       Please remember that 'Organistional matters' meaning anything related to HR policies, IT support, company events, and legal information and not about general or public information.
       Only respond with the category name and the reason for opting that category as the following format of json.
@@ -125,6 +125,15 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
       - "How do I report a security incident?"
       - "What is the procedure for booking a conference room?"
       - "How do I access the company handbook?"
+      - "What are the company's core values?"
+      - "How do I contact the legal department?"
+      - "What is the procedure for requesting a new laptop?"
+      - "What is the process for onboarding a new employee?"
+      - "What is the budget for the finance department?"
+      - "How do I submit an expense report?"
+      - "What is the process for requesting a budget increase?"
+      - "How do I access financial statements?"
+      - "What are the finance department's office hours?"
       
       Examples of 'Not Related to Organisation' queries:
       - "What is the weather today?"
@@ -132,8 +141,11 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
       - "What is the capital of France?"
       - "What is the latest movie in theaters?"
       - "What is the best restaurant in town?"
+      - "Who won the last football game?"
+      - "What is the population of New York?"
     `;
 
+    
     const classificationResponse = await performLLM(classificationPrompt);
     console.log('Classification Response:', classificationResponse);
 

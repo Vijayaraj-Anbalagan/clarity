@@ -117,7 +117,7 @@ export async function parseAndFetchPDFResult(inputUrlOrS3Path: string) {
 
     // Insert data into ChromaDB
     const collection = await client.createCollection({
-      name: 'company_handbookeval',
+      name: 'company_handbookevalll',
       createIfMissing: true,
       index: {
         type: 'hnsw', // Set the index type to HNSW
@@ -197,4 +197,3 @@ const s3Path = 'ss_handbook.pdf'; // S3 path
 
 const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR';
 
-parseAndFetchPDFResult(s3Path);

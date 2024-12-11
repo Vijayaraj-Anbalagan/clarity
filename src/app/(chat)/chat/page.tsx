@@ -59,6 +59,81 @@ export default function ChatInterface() {
       });
   };
 
+  // const sendMessageToAPI = async (query: string) => {
+  //   setChatHistory((prevChatHistory) => [
+  //     ...prevChatHistory,
+  //     { role: 'user', message: query },
+  //   ]);
+  //   setIsLoading(true);
+
+  //   try {
+  //     // Define the payloads for the requests
+  //     const langGraphPayload = JSON.stringify({
+  //       query,
+  //       history: chatHistory,
+  //       sessionId,
+  //     });
+
+  //     const chunksRetrievalPayload = JSON.stringify({
+  //       query,
+  //     });
+
+  //     // Trigger both API requests simultaneously using Promise.all
+  //     const [langGraphResponse, chunksRetrievalResponse] = await Promise.all([
+  //       fetch('/api/langgraph', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: langGraphPayload,
+  //       }),
+  //       fetch('https://80a7-117-96-40-60.ngrok-free.app/query', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: chunksRetrievalPayload,
+  //       }),
+  //     ]);
+
+  //     // Check if both responses are successful
+  //     if (!langGraphResponse.ok || !chunksRetrievalResponse.ok) {
+  //       throw new Error('Failed to fetch one or more APIs');
+  //     }
+
+  //     // Parse JSON responses
+  //     const langGraphData = await langGraphResponse.json();
+  //     const chunksRetrievalData = await chunksRetrievalResponse.json();
+
+  //     // Extract responses
+  //     const botResponse = langGraphData.response;
+  //     const chunksResponse = chunksRetrievalData.response;
+
+  //     // Update the chat history with the bot's response
+  //     setChatHistory((prevChatHistory) => [
+  //       ...prevChatHistory,
+  //       { role: 'model', message: botResponse },
+  //     ]);
+
+  //     // Optionally handle the chunks response
+  //     console.log('Chunks retrieval response:', chunksResponse);
+
+  //     // Update session ID if needed
+  //     if (langGraphData.sessionId) {
+  //       setSessionId(langGraphData.sessionId);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error communicating with the APIs:', error);
+
+  //     // Add an error message to the chat history
+  //     setChatHistory((prevChatHistory) => [
+  //       ...prevChatHistory,
+  //       {
+  //         role: 'model',
+  //         message: 'Sorry, something went wrong. Please try again.',
+  //       },
+  //     ]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const sendMessageToAPI = async (query: string) => {
     setChatHistory((prevChatHistory) => [
       ...prevChatHistory,
@@ -66,61 +141,26 @@ export default function ChatInterface() {
     ]);
     setIsLoading(true);
 
+    const ragPayload = JSON.stringify({
+      query,
+      history: chatHistory,
+      sessionId,
+    });
     try {
-      // Define the payloads for the requests
-      const langGraphPayload = JSON.stringify({
-        query,
-        history: chatHistory,
-        sessionId,
-      });
-
-      const chunksRetrievalPayload = JSON.stringify({
-        query,
-      });
-
-      // Trigger both API requests simultaneously using Promise.all
-      const [langGraphResponse, chunksRetrievalResponse] = await Promise.all([
-        fetch('/api/langgraph', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: langGraphPayload,
-        }),
-        fetch('https://80a7-117-96-40-60.ngrok-free.app/query', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: chunksRetrievalPayload,
-        }),
-      ]);
-
-      // Check if both responses are successful
-      if (!langGraphResponse.ok || !chunksRetrievalResponse.ok) {
+      const botResponse = await axios.post('/api/rag', ragPayload);
+      if (!botResponse) {
         throw new Error('Failed to fetch one or more APIs');
       }
-
-      // Parse JSON responses
-      const langGraphData = await langGraphResponse.json();
-      const chunksRetrievalData = await chunksRetrievalResponse.json();
-
-      // Extract responses
-      const botResponse = langGraphData.response;
-      const chunksResponse = chunksRetrievalData.response;
-
-      // Update the chat history with the bot's response
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
-        { role: 'model', message: botResponse },
+        { role: 'model', message: botResponse.data.response },
       ]);
-
-      // Optionally handle the chunks response
-      console.log('Chunks retrieval response:', chunksResponse);
-
-      // Update session ID if needed
-      if (langGraphData.sessionId) {
-        setSessionId(langGraphData.sessionId);
+      if (botResponse.data.sessionId) {
+        setSessionId(botResponse.data.sessionId);
       }
+      setIsLoading(false);
     } catch (error) {
       console.error('Error communicating with the APIs:', error);
-
       // Add an error message to the chat history
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
