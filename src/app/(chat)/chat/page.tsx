@@ -46,6 +46,7 @@ export default function ChatInterface() {
 
   //TODO : Fix Sessions
   // Function to start a new chat session
+  //Testing
   const startNewChat = async () => {
     setChatHistory([]);
     await axios
