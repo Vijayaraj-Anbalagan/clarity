@@ -365,6 +365,27 @@ export default function ChatInterface() {
 
         {/* Chat Messages */}
         <ScrollArea className="flex-grow p-4 space-y-4">
+          <div className="bg-stone-800 text-white p-4 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+              Welcome to Clarity! 🎉
+            </h2>
+            <p className="text-sm text-gray-300">
+              I'm your AI assistant, here to help you with any questions or
+              tasks. Here's how you can get started:
+            </p>
+            <ul className="list-disc list-inside mt-3 text-sm text-gray-400">
+              <li>Type "Tell me about the company's policy" to learn more.</li>
+              <li>
+                Ask "What are the common team rules?" for team guidelines.
+              </li>
+              <li>
+                Say "Help me with project ideas" for brainstorming assistance.
+              </li>
+            </ul>
+            <p className="mt-3 text-sm text-gray-300">
+              Feel free to ask anything or click the examples to get started!
+            </p>
+          </div>
           {chatHistory.map((chat, index) => (
             <div
               key={index}
