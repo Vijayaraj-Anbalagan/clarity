@@ -9,18 +9,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Mic,
-  Paperclip,
-  Send,
-  Heart,
-  Smile,
-  ChevronLeft,
-  User,
-} from 'lucide-react';
+import { Send, ChevronLeft, User, LogOut, Shield } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export default function ChatInterface() {
   const router = useRouter();
@@ -32,6 +31,7 @@ export default function ChatInterface() {
   const [chatSessions, setChatSessions] = useState<any[]>([]);
   const [isEmpathyMode, setisEmpathyMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleLogout = async () => {
     try {
       await axios.get('api/logout');
@@ -280,40 +280,83 @@ export default function ChatInterface() {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Pink Mode Toggle */}
-            <div className="flex items-center space-x-4">
-              <label
-                htmlFor="empathy-mode-toggle"
-                className="flex items-center cursor-pointer"
-              >
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    id="empathy-mode-toggle"
-                    className="sr-only"
-                    checked={isEmpathyMode}
-                    onChange={handleEmpathyModeToggle}
-                  />
-                  <div
-                    className={`w-14 h-7 rounded-full transition-colors ${
-                      isEmpathyMode ? 'bg-[#FFB6C1]' : 'bg-gray-600'
-                    }`}
-                  ></div>
-                  <div
-                    className={`absolute top-0.5 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
-                      isEmpathyMode ? 'transform translate-x-7' : ''
-                    }`}
-                  ></div>
-                </div>
-                <span
-                  className={`ml-3 text-sm font-medium ${
-                    isEmpathyMode ? 'text-[#4A4A4A]' : 'text-white'
-                  }`}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={
+                    isEmpathyMode
+                      ? 'text-pink-700 hover:text-pink-500'
+                      : 'text-white hover:text-yellow-400'
+                  }
                 >
-                  {isEmpathyMode ? 'Empathy Mode On' : 'Empathy Mode Off'}
-                </span>
-              </label>
-            </div>
+                  <User className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                className={`sm:max-w-[425px] ${
+                  isEmpathyMode ? 'bg-pink-50' : 'bg-stone-900'
+                }`}
+              >
+                <DialogHeader>
+                  <DialogTitle
+                    className={
+                      isEmpathyMode ? 'text-pink-700' : 'text-yellow-400'
+                    }
+                  >
+                    Profile Options
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <Button
+                    variant="ghost"
+                    className={`flex justify-start items-center space-x-2 ${
+                      isEmpathyMode
+                        ? 'text-pink-700 hover:bg-pink-100'
+                        : 'text-white hover:bg-stone-800'
+                    }`}
+                    onClick={() => {
+                      console.log('View profile');
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    <User className="h-5 w-5" />
+                    <span>View Profile</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className={`flex justify-start items-center space-x-2 ${
+                      isEmpathyMode
+                        ? 'text-pink-700 hover:bg-pink-100'
+                        : 'text-white hover:bg-yellow-400'
+                    }`}
+                    onClick={() => {
+                      router.push('/2fa');
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    <Shield className="h-5 w-5" />
+                    <span>Enable Two-Step Auth</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className={`flex justify-start items-center space-x-2 ${
+                      isEmpathyMode
+                        ? 'text-pink-700 hover:bg-pink-100'
+                        : 'text-white hover:bg-yellow-400'
+                    }`}
+                    onClick={() => {
+                      handleLogout();
+                      setIsDialogOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Logout</span>
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </header>
 

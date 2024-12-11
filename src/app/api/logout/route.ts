@@ -7,7 +7,7 @@ import { cookiesParse } from '@/utils/cookies';
 export async function GET(request: NextRequest) {
   const user = await cookiesParse(request);
   console.log(user);
-
+  console.log(user);
   dbConnect();
   const tokenDelete = await Token.findOneAndDelete({ user: user._id });
   cookies().delete('refreshToken');

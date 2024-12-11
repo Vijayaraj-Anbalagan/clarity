@@ -51,7 +51,7 @@ const VerifyEmailContent = () => {
         // Redirect after 2 seconds
         setTimeout(() => {
           router.push('/chat');
-        }, 2000);
+        }, 1000);
       } else {
         setLoading(false);
         setError(true);
