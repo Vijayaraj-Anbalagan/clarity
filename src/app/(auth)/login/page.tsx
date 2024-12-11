@@ -102,12 +102,7 @@ const Login = () => {
       router.replace('/chat');
     } else if (result.status === 200 && result.data.otpReq === true) {
       setStep('otp');
-      const response = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
+      const response = await axios.post('/api/send-otp', { email });
     } else {
       toast({ variant: 'destructive', title: result.data });
     }

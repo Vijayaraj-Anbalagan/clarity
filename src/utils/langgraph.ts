@@ -23,8 +23,12 @@ const StateAnnotation = Annotation.Root({
 });
 
 // Function to perform a RAG workflow
-async function performRAG(userPrompt: string): Promise<string> {
+async function performRAG(
+  context: string,
+  userPrompt: string
+): Promise<string> {
   console.log('Query form socket', userPrompt);
+  console.log('Wuery', context);
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
@@ -41,7 +45,9 @@ Guidelines:
    "I'm sorry, I could not find the information you are looking for in the provided context. Please reach out to the appropriate department for further assistance."
 4. Maintain a formal, professional, and concise tone.
 5. Avoid embellishments, unnecessary framing, or speculative details.
-6. Begin directly with actionable information, avoiding phrases like "Based on the context provided" or "The procedure is as follows."
+6. Begin directly with actionable information, avoiding phrases like "Based on the context provided" or "The procedure is as follows.
+
+Context: ${context}"
           `,
         },
         {
@@ -146,8 +152,10 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
 
 // Workflow nodes
 async function callRAG(state: typeof StateAnnotation.State) {
-  console.log('callRAG');
-
+  console.log('callRAG', state.messages);
+  const query = String(
+    state.messages[state.messages.length - 2]?.content || ''
+  );
   let response = '';
   let queryResponse = '';
 
@@ -168,7 +176,7 @@ async function callRAG(state: typeof StateAnnotation.State) {
 
     // Perform RAG using the received query response
     if (queryResponse) {
-      response = await performRAG(queryResponse);
+      response = await performRAG(queryResponse, query);
     }
 
     console.log('Final Response in Frontend:', response);

@@ -7,7 +7,7 @@ import { cookiesParse } from '@/utils/cookies';
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await cookiesParse(req)
+    const user = await cookiesParse(req);
     const bucketName = process.env.AWS_S3_BUCKET_NAME!;
     const region = process.env.AWS_REGION!;
     const s3Client = new S3Client({ region });
@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
     if (!fileExtension || !allowedExtensions.includes(`.${fileExtension}`)) {
       return NextResponse.json(
         {
-          error: `Invalid file type: .${fileExtension}. Allowed types are ${allowedExtensions.join(', ')}`,
+          error: `Invalid file type: .${fileExtension}. Allowed types are ${allowedExtensions.join(
+            ', '
+          )}`,
         },
         { status: 400 }
       );
@@ -64,24 +66,23 @@ export async function POST(req: NextRequest) {
     const existingFile = await File.findOne({ user: user._id });
 
     if (existingFile) {
-        existingFile.files.push({
+      existingFile.files.push({
+        fileName: file.name,
+        url: fileUrl,
+        details: 'Uploaded file',
+      });
+      await existingFile.save();
+    } else {
+      const newFile = new File({
+        user: user._id,
+        files: [
+          {
             fileName: file.name,
             url: fileUrl,
-            details: 'Uploaded file',
-        });
-        await existingFile.save();
-    } else {
-        const newFile = new File({
-            user: user._id,
-            files: [
-                {
-                    fileName: file.name,
-                    url: fileUrl,
-                    status: 'pending',
-                },
-            ],
-        });
-        await newFile.save();
+          },
+        ],
+      });
+      await newFile.save();
     }
     return NextResponse.json({
       message: 'File uploaded successfully.',
