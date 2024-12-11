@@ -4,6 +4,8 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { Readable } from 'stream';
 import File from '@/models/files';
 import { cookiesParse } from '@/utils/cookies';
+import { parseAndFetchPDFResult } from '../../../../llamaparser';
+import axios from 'axios';
 
 export async function POST(req: NextRequest) {
   try {
@@ -61,6 +63,9 @@ export async function POST(req: NextRequest) {
 
     const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${uploadKey}`;
 
+    axios.post('https://80a7-117-96-40-60.ngrok-free.app/pdfUpload', {
+      fileUrl,
+    });
     // Assuming you have a File model and a way to save it
 
     const existingFile = await File.findOne({ user: user._id });

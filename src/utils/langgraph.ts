@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 
 // Initialize Groq
 const groq = new Groq();
-const socket = io('http://localhost:5000');
+const socket = io('https://80a7-117-96-40-60.ngrok-free.app');
 
 socket.on('connect', () => {
   console.log('Connected to the server.');

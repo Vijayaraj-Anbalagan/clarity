@@ -6,10 +6,15 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Send,
   ChevronLeft,
+  User,
+  LogOut,
+  Shield,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
 
 export default function ChatInterface() {
   const router = useRouter();
@@ -21,6 +26,7 @@ export default function ChatInterface() {
   const [chatSessions, setChatSessions] = useState<any[]>([]);
   const [isEmpathyMode, setisEmpathyMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleLogout = async () => {
     try {
       await axios.get('api/logout');
@@ -66,12 +72,12 @@ export default function ChatInterface() {
 
       // Trigger both API requests simultaneously using Promise.all
       const [langGraphResponse, chunksRetrievalResponse] = await Promise.all([
-        fetch('http://localhost:3000/api/langgraph', {
+        fetch('/api/langgraph', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: langGraphPayload,
         }),
-        fetch('http://localhost:5000/query', {
+        fetch('https://80a7-117-96-40-60.ngrok-free.app/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: chunksRetrievalPayload,
@@ -269,68 +275,96 @@ export default function ChatInterface() {
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            {/* Pink Mode Toggle */}
-            <div className="flex items-center space-x-4">
-              <label
-                htmlFor="empathy-mode-toggle"
-                className="flex items-center cursor-pointer"
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={isEmpathyMode ? 'text-pink-700 hover:text-pink-500' : 'text-white hover:text-yellow-400'}
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className={`sm:max-w-[425px] ${isEmpathyMode ? 'bg-pink-50' : 'bg-stone-900'}`}>
+            <DialogHeader>
+              <DialogTitle className={isEmpathyMode ? 'text-pink-700' : 'text-yellow-400'}>Profile Options</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Button
+                variant="ghost"
+                className={`flex justify-start items-center space-x-2 ${
+                  isEmpathyMode ? 'text-pink-700 hover:bg-pink-100' : 'text-white hover:bg-stone-800'
+                }`}
+                onClick={() => {
+                  console.log("View profile")
+                  setIsDialogOpen(false)
+                }}
               >
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    id="empathy-mode-toggle"
-                    className="sr-only"
-                    checked={isEmpathyMode}
-                    onChange={handleEmpathyModeToggle}
-                  />
-                  <div
-                    className={`w-14 h-7 rounded-full transition-colors ${
-                      isEmpathyMode ? 'bg-[#FFB6C1]' : 'bg-gray-600'
-                    }`}
-                  ></div>
-                  <div
-                    className={`absolute top-0.5 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
-                      isEmpathyMode ? 'transform translate-x-7' : ''
-                    }`}
-                  ></div>
-                </div>
-                <span
-                  className={`ml-3 text-sm font-medium ${
-                    isEmpathyMode ? 'text-[#4A4A4A]' : 'text-white'
-                  }`}
-                >
-                  {isEmpathyMode ? 'Empathy Mode On' : 'Empathy Mode Off'}
-                </span>
-              </label>
+                <User className="h-5 w-5" />
+                <span>View Profile</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className={`flex justify-start items-center space-x-2 ${
+                  isEmpathyMode ? 'text-pink-700 hover:bg-pink-100' : 'text-white hover:bg-stone-800'
+                }`}
+                onClick={() => {
+                  console.log("Enable two-step auth")
+                  setIsDialogOpen(false)
+                }}
+              >
+                <Shield className="h-5 w-5" />
+                <span>Enable Two-Step Auth</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className={`flex justify-start items-center space-x-2 ${
+                  isEmpathyMode ? 'text-pink-700 hover:bg-pink-100' : 'text-white hover:bg-stone-800'
+                }`}
+                onClick={() => {
+                  console.log("Logout")
+                  setIsDialogOpen(false)
+                }}
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+              </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+            
           </div>
         </header>
 
         {/* Chat Messages */}
         <ScrollArea className="flex-grow p-4 space-y-4">
-          {chatHistory.map((chat, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                chat.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <div
-                className={`p-3 rounded-lg ${
-                  chat.role === 'user'
-                    ? isEmpathyMode
-                      ? 'bg-[#FFB6C1] text-[#6D214F]'
-                      : 'bg-yellow-400 text-black'
-                    : isEmpathyMode
-                    ? 'bg-[#F4A7B9] text-[#4A4A4A]'
-                    : 'bg-stone-800 text-white'
-                }`}
-              >
-                {chat.message}
-              </div>
-            </div>
-          ))}
-          {isLoading && <div className="text-yellow-400">Typing...</div>}
+
+        {chatHistory.map((chat, index) => (
+  <div
+    key={index}
+    className={`flex mb-3 ${
+      chat.role === 'user' ? 'justify-end' : 'justify-start'
+    }`}
+  >
+    <div
+      className={`max-w-[75%] p-3 rounded-lg shadow-md ${
+        chat.role === 'user'
+          ? isEmpathyMode
+            ? 'bg-[#FFB6C1] text-[#6D214F]'
+            : 'bg-yellow-400 text-black'
+          : isEmpathyMode
+          ? 'bg-[#F4A7B9] text-[#4A4A4A]'
+          : 'bg-stone-800 text-white'
+      }`}
+    >
+      {chat.message}
+    </div>
+  </div>
+))}
+
+{isLoading && (
+  <div className="text-yellow-400 mt-3 animate-pulse">Typing...</div>
+)}
         </ScrollArea>
 
         {/* Input Area */}

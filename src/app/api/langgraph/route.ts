@@ -73,16 +73,17 @@ export async function POST(req: NextRequest) {
 
     console.log(`Response time: ${responseTime}ms`);
 
-    const sentimentAnalysis = await axios.post(
-      'http://localhost:3000/api/sentimentAnalysis',
-      {
-        text: query,
-      }
-    );
+    // const sentimentAnalysis = await axios.post(
+    //   '/api/sentimentAnalysis',
+    //   {
+    //     text: query,
+    //   }
+    // );
 
     //ToDO: Optimise
-    const sentiment = sentimentAnalysis.data.classification;
+    // const sentiment = sentimentAnalysis.data.classification;
 
+    const sentiment = 'positive';
     console.log('Sentiment', sentiment);
     // Find the user and update using schema methods
     const userRecord = await User.findById(user._id);
@@ -91,11 +92,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Update metrics using schema methods
-    userRecord.updateEngagementMetrics(
-      2,
-      sentiment.toLowerCase(),
-      responseTime
-    );
+    userRecord.updateEngagementMetrics(2, sentiment, responseTime);
     userRecord.incrementSessions();
     await userRecord.save();
 
