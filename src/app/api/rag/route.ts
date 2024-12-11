@@ -32,6 +32,9 @@ Guidelines:
 4. Maintain a formal, professional, and concise tone.
 5. Avoid embellishments, unnecessary framing, or speculative details.
 6. Begin directly with actionable information, avoiding phrases like "Based on the context provided" or "The procedure is as follows.
+7. Must give response based only on the context provided below.
+8. Should give response in not more than  3-4 lines.
+
 
 Context: ${context}"
           `,
