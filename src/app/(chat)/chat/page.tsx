@@ -371,16 +371,16 @@ export default function ChatInterface() {
               Welcome to Clarity! 🎉
             </h2>
             <p className="text-sm text-gray-300">
-              I'm your AI assistant, here to help you with any questions or
-              tasks. Here's how you can get started:
+              Im your AI assistant, here to help you with any questions or
+              tasks. Heres how you can get started:
             </p>
             <ul className="list-disc list-inside mt-3 text-sm text-gray-400">
-              <li>Type "Tell me about the company's policy" to learn more.</li>
+              <li>Type Tell me about the companys policy to learn more.</li>
               <li>
-                Ask "What are the common team rules?" for team guidelines.
+                Ask What are the common team rules? for team guidelines.
               </li>
               <li>
-                Say "Help me with project ideas" for brainstorming assistance.
+                Say Help me with project ideas for brainstorming assistance.
               </li>
             </ul>
             <p className="mt-3 text-sm text-gray-300">
@@ -406,6 +406,7 @@ export default function ChatInterface() {
                 }`}
               >
                 <ReactMarkdown
+                  // eslint-disable-next-line react/no-children-prop
                   children={chat.message}
                   remarkPlugins={[remarkGfm]}
                   className="prose prose-sm prose-invert"
