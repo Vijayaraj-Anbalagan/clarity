@@ -3,11 +3,12 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { CircleX, SquareCheckBig } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import React, { useEffect, Suspense } from 'react';
 
 const VerifyEmailContent = () => {
   const { toast } = useToast();
+  const router = useRouter(); // Add the router for navigation
 
   const [loading, setLoading] = React.useState(false);
   const [verified, setVerified] = React.useState(false);
@@ -47,6 +48,10 @@ const VerifyEmailContent = () => {
       if (res.ok) {
         setLoading(false);
         setVerified(true);
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          router.push('/chat');
+        }, 2000);
       } else {
         setLoading(false);
         setError(true);
@@ -73,7 +78,7 @@ const VerifyEmailContent = () => {
             <SquareCheckBig color="white" />
             <AlertTitle>Email Verified!</AlertTitle>
             <AlertDescription>
-              Your email has been verified successfully.
+              Your email has been verified successfully. Redirecting to chat...
             </AlertDescription>
           </Alert>
         )}
