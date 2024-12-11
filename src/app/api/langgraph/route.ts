@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     console.log(`Response time: ${responseTime}ms`);
 
     const sentimentAnalysis = await axios.post(
-      'http://localhost:3000/api/sentimentAnalysis',
+      '/api/sentimentAnalysis',
       {
         text: query,
       }

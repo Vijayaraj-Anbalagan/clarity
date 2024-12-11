@@ -77,12 +77,12 @@ export default function ChatInterface() {
 
       // Trigger both API requests simultaneously using Promise.all
       const [langGraphResponse, chunksRetrievalResponse] = await Promise.all([
-        fetch('http://localhost:3000/api/langgraph', {
+        fetch('/api/langgraph', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: langGraphPayload,
         }),
-        fetch('http://localhost:5000/query', {
+        fetch('https://clarity-node.onrender.com/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: chunksRetrievalPayload,

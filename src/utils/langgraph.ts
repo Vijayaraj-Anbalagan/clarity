@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 
 // Initialize Groq
 const groq = new Groq();
-const socket = io('http://localhost:5000');
+const socket = io('https://clarity-node.onrender.com');
 
 socket.on('connect', () => {
   console.log('Connected to the server.');

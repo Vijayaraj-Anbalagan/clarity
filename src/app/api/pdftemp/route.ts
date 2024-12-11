@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${uploadKey}`;
 
-    axios.post('http://localhost:5000/pdfUpload', {
+    axios.post('https://clarity-node.onrender.com/pdfUpload', {
       fileUrl,
     });
     // Assuming you have a File model and a way to save it
