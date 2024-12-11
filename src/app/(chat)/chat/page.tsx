@@ -20,6 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ChatInterface() {
   const router = useRouter();
@@ -366,26 +368,32 @@ export default function ChatInterface() {
           {chatHistory.map((chat, index) => (
             <div
               key={index}
-              className={`flex ${
+              className={`flex mb-3 ${
                 chat.role === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
               <div
-                className={`p-3 rounded-lg ${
+                className={`max-w-[75%] p-3 rounded-lg shadow-md ${
                   chat.role === 'user'
                     ? isEmpathyMode
                       ? 'bg-[#FFB6C1] text-[#6D214F]'
-                      : 'bg-yellow-400 text-black'
+                      : 'bg-yellow-600 text-black'
                     : isEmpathyMode
                     ? 'bg-[#F4A7B9] text-[#4A4A4A]'
                     : 'bg-stone-800 text-white'
                 }`}
               >
-                {chat.message}
+                <ReactMarkdown
+                  children={chat.message}
+                  remarkPlugins={[remarkGfm]}
+                  className="prose prose-sm prose-invert"
+                />
               </div>
             </div>
           ))}
-          {isLoading && <div className="text-yellow-400">Typing...</div>}
+          {isLoading && (
+            <div className="text-yellow-400 mt-3 animate-pulse">Typing...</div>
+          )}
         </ScrollArea>
 
         {/* Input Area */}
