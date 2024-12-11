@@ -3,20 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MetricControlDialogWithToggle } from '@/components/metricControl';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Mic,
-  Paperclip,
   Send,
-  Heart,
-  Smile,
   ChevronLeft,
-  User,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import axios from 'axios';

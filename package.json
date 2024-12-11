@@ -50,7 +50,7 @@
     "firebase": "^10.14.1",
     "form-data": "^4.0.1",
     "formidable": "^3.5.2",
-    "framer-motion": "^11.5.2",
+    "framer-motion": "^11.13.5",
     "groq-sdk": "^0.8.0",
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.6",
