@@ -1,16 +1,16 @@
 const axios = require('axios');
-const fs = require('fs');
 const FormDataLib = require('form-data');
-const { ChromaClient : MyCromaClient } = require('chromadb');
+const { ChromaClient: MyCromaClient } = require('chromadb');
 
-async function parseAndFetchPDFResult(inputUrlOrS3Path: string, apiKey: string) {
+export async function parseAndFetchPDFResult(inputUrlOrS3Path: string) {
+  const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR';
   try {
     // Step 1: Upload PDF for parsing
     const form = new FormDataLib();
-    if (inputUrlOrS3Path.startsWith("s3://")) {
-      form.append("input_s3_path", inputUrlOrS3Path); // Use S3 path
+    if (inputUrlOrS3Path.startsWith('s3://')) {
+      form.append('input_s3_path', inputUrlOrS3Path); // Use S3 path
     } else {
-      form.append("input_url", inputUrlOrS3Path); // Use URL
+      form.append('input_url', inputUrlOrS3Path); // Use URL
     }
     form.append('is_formatting_instruction', 'true'); // Enable formatting instructions
     form.append(
@@ -117,7 +117,7 @@ async function parseAndFetchPDFResult(inputUrlOrS3Path: string, apiKey: string) 
 
     // Insert data into ChromaDB
     const collection = await client.createCollection({
-      name: 'company_handbooknew',
+      name: 'company_handbookeval',
       createIfMissing: true,
       index: {
         type: 'hnsw', // Set the index type to HNSW
@@ -193,8 +193,8 @@ async function parseAndFetchPDFResult(inputUrlOrS3Path: string, apiKey: string) 
 }
 
 // Usage
-const s3Path = "https://claritydatasih.s3.ap-south-1.amazonaws.com/uploads/1733712638739-Team%20Ignite%20with%20Mentor.pdf"; // S3 path
+const s3Path = 'ss_handbook.pdf'; // S3 path
 
-const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR'; // Your API key
+const apiKey = 'llx-UV4OMaua58thneH8I5SUKzE5pRzYfmdiOfljdcl7yKbVRSkR';
 
-parseAndFetchPDFResult( s3Path, apiKey);
+parseAndFetchPDFResult(s3Path);
