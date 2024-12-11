@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 
 // Initialize Groq
 const groq = new Groq();
-const socket = io('https://clarity-node.onrender.com');
+const socket = io('https://80a7-117-96-40-60.ngrok-free.app');
 
 socket.on('connect', () => {
   console.log('Connected to the server.');

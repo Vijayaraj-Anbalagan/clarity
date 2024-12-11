@@ -82,7 +82,7 @@ export default function ChatInterface() {
           headers: { 'Content-Type': 'application/json' },
           body: langGraphPayload,
         }),
-        fetch('https://clarity-node.onrender.com/query', {
+        fetch('https://80a7-117-96-40-60.ngrok-free.app/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: chunksRetrievalPayload,
