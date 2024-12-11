@@ -63,7 +63,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     sendCookies(user, refreshTokenUser);
 
     // Respond with the user details
-    return NextResponse.json({ otpReq: true }, { status: 200 });
+    return NextResponse.json(
+      { otpReq: true, userId: user._id },
+      { status: 200 }
+    );
   } catch (error: any) {
     // Handle errors appropriately
     return NextResponse.json(

@@ -53,7 +53,10 @@ export async function POST(request: Request) {
     // Send verification email
     await sendEmail(newUser?.email, 'Email Verification', message);
 
-    return NextResponse.json({ accessTokenUser }, { status: 201 });
+    return NextResponse.json(
+      { accessTokenUser, userId: newUser._id },
+      { status: 201 }
+    );
   } catch (error) {
     console.log(error);
 

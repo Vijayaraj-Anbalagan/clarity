@@ -73,9 +73,7 @@ export default function ChatInterface() {
 
       const chunksRetrievalPayload = JSON.stringify({
         query,
-        sessionId,
       });
-      
 
       // Trigger both API requests simultaneously using Promise.all
       const [langGraphResponse, chunksRetrievalResponse] = await Promise.all([
