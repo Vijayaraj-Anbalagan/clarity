@@ -67,6 +67,7 @@
     "npm": "^10.9.2",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdf2json": "^3.1.4",
     "puppeteer": "^23.8.0",
     "react": "^18",
     "react-dom": "^18",
