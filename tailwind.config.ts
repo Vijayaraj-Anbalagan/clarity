@@ -9,46 +9,45 @@ const config: Config = {
   ],
   theme: {
   	extend: {
-
-		
-
-		animation: {
-			orbit: "orbit calc(var(--duration)*1s) linear infinite",
-			shimmer: "shimmer 8s infinite",
-		  },
-		  keyframes: {
-
-			shimmer: {
-				"0%, 90%, 100%": {
-				  "background-position": "calc(-100% - var(--shimmer-width)) 0",
-				},
-				"30%, 60%": {
-				  "background-position": "calc(100% + var(--shimmer-width)) 0",
-				},
-			  },
-			  
-			"shine-pulse": {
-          "0%": {
-            "background-position": "0% 0%",
-          },
-          "50%": {
-            "background-position": "100% 100%",
-          },
-          to: {
-            "background-position": "0% 0%",
-          },
-        },
-			orbit: {
-			  "0%": {
-				transform:
-				  "rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg)",
-			  },
-			  "100%": {
-				transform:
-				  "rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)",
-			  },
-			},
-		  },
+  		animation: {
+  			orbit: 'orbit calc(var(--duration)*1s) linear infinite',
+  			shimmer: 'shimmer 8s infinite',
+  			gradient: 'gradient 8s linear infinite'
+  		},
+  		keyframes: {
+  			shimmer: {
+  				'0%, 90%, 100%': {
+  					'background-position': 'calc(-100% - var(--shimmer-width)) 0'
+  				},
+  				'30%, 60%': {
+  					'background-position': 'calc(100% + var(--shimmer-width)) 0'
+  				}
+  			},
+  			'shine-pulse': {
+  				'0%': {
+  					'background-position': '0% 0%'
+  				},
+  				'50%': {
+  					'background-position': '100% 100%'
+  				},
+  				to: {
+  					'background-position': '0% 0%'
+  				}
+  			},
+  			orbit: {
+  				'0%': {
+  					transform: 'rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg)'
+  				},
+  				'100%': {
+  					transform: 'rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)'
+  				}
+  			},
+  			gradient: {
+  				to: {
+  					backgroundPosition: 'var(--bg-size) 0'
+  				}
+  			}
+  		},
   		backgroundImage: {
   			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
   			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'

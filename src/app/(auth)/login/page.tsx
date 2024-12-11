@@ -117,65 +117,82 @@ const Login = () => {
       >
         {step === 'email' ? (
           <>
-            <Card className="w-full max-w-md overflow-hidden bg-black text-white shadow-2xl">
-              <div className="absolute inset-0 bg-black opacity-10"></div>
-              <CardHeader className="relative space-y-1 border-b border-gray-800 px-6 pb-6 pt-8">
-                <CardTitle className="text-3xl font-bold">
+            <Card className="relative w-full max-w-md overflow-hidden bg-black text-white shadow-2xl rounded-lg">
+              {/* Background Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black opacity-30 pointer-events-none"></div>
+
+              {/* Header */}
+              <CardHeader className="relative space-y-2 border-b border-gray-800 px-6 pb-6 pt-8 text-center">
+                <CardTitle className="text-4xl font-extrabold text-yellow-400">
                   Welcome Back
                 </CardTitle>
                 <CardDescription className="text-gray-400">
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
-              <CardContent className="relative space-y-4 px-6 py-8">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="email"
-                    className="text-sm font-medium text-gray-200"
-                  >
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border-gray-700 bg-white text-black placeholder:text-gray-500"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="password"
-                    className="text-sm font-medium text-gray-200"
-                  >
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="border-gray-700 bg-white pr-10 text-black placeholder:text-gray-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+
+              {/* Form Content */}
+              <CardContent className="relative space-y-6 px-6 py-8">
+                <div className="space-y-4">
+                  {/* Email Field */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="email"
+                      className="text-sm font-medium text-gray-200"
                     >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="john@example.com"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-md border-gray-700 bg-gray-900 text-white placeholder-gray-500 focus:border-yellow-400 focus:ring-yellow-400"
+                    />
+                  </div>
+
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="password"
+                      className="text-sm font-medium text-gray-200"
+                    >
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter your password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full rounded-md border-gray-700 bg-gray-900 pr-10 text-white placeholder-gray-500 focus:border-yellow-400 focus:ring-yellow-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400"
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} />
+                        ) : (
+                          <Eye size={20} />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {/* Remember Me and Forgot Password */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
                       id="remember"
-                      className="h-4 w-4 rounded border-gray-600 bg-white text-yellow-400 focus:ring-yellow-500"
+                      className="h-4 w-4 rounded border-gray-600 bg-gray-900 text-yellow-400 focus:ring-yellow-400"
                     />
                     <Label htmlFor="remember" className="text-sm text-gray-400">
                       Remember me
@@ -183,22 +200,35 @@ const Login = () => {
                   </div>
                   <a
                     href="#"
-                    className="text-sm text-yellow-400 hover:underline"
+                    className="text-sm text-yellow-400 hover:underline hover:text-yellow-500 transition-colors"
                   >
                     Forgot password?
                   </a>
                 </div>
               </CardContent>
-              <CardFooter className="relative border-t border-gray-800 px-6 py-8">
+
+              {/* Footer */}
+              <CardFooter className="relative border-t border-gray-800 px-6 py-6 flex flex-col items-center space-y-4">
                 <Button
-                  className="w-full bg-yellow-400 text-black hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  className="w-full rounded-md bg-yellow-400 text-black font-semibold hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-black transition-transform transform hover:scale-95"
                   onClick={handleSubmit}
                   disabled={loading}
                 >
                   {loading ? 'Logging in...' : 'Login'}
                 </Button>
+                <p className="text-center text-sm text-gray-400">
+                  Dont have an account?{' '}
+                  <a
+                    href="/register"
+                    className="font-semibold text-yellow-400 hover:underline hover:text-yellow-500"
+                  >
+                    Create an account
+                  </a>
+                </p>
               </CardFooter>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600"></div>
+
+              {/* Bottom Gradient */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 animate-pulse"></div>
             </Card>
           </>
         ) : (
