@@ -35,6 +35,7 @@ export default function ChatInterface() {
   const handleLogout = async () => {
     try {
       await axios.get('api/logout');
+      router.replace('/');
     } catch (error: any) {
       console.error(error);
     }
@@ -314,7 +315,7 @@ export default function ChatInterface() {
                     className={`flex justify-start items-center space-x-2 ${
                       isEmpathyMode
                         ? 'text-pink-700 hover:bg-pink-100'
-                        : 'text-white hover:bg-stone-800'
+                        : 'text-white hover:bg-yellow-400'
                     }`}
                     onClick={() => {
                       console.log('View profile');
