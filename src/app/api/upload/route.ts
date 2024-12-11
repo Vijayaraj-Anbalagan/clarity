@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pdfParse from 'pdf-parse';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,15 +30,32 @@ export async function POST(req: NextRequest) {
     const pdfData = await pdfParse(fileBuffer);
     const parsedText = pdfData.text;
 
-    // Respond with extracted text
+    // Split the text into manageable chunks
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 300,
+      chunkOverlap: 0,
+    });
+
+    const chunks = textSplitter.splitText(parsedText);
+    const documents = chunks; // Array of text chunks
+    const ids = (await chunks).map((_: any, index: number) => `id${index + 1}`); // Corresponding IDs
+
+    console.log('Chunks and IDs generated successfully.', documents, ids);
+
+    // Respond with extracted text, chunks, and IDs
     return NextResponse.json({
       text: parsedText,
       fileName,
+      documents,
+      ids,
     });
   } catch (error) {
-    return NextResponse.json({
-      error: 'Internal Server Error',
-      errorMessage: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal Server Error',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }
