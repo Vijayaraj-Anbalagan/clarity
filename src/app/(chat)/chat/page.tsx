@@ -21,7 +21,7 @@ export default function ChatInterface() {
   const router = useRouter();
   const [inputValue, setInputValue] = useState('');
   const [chatHistory, setChatHistory] = useState<
-    { role: string; message: string }[]
+    { role: string; message: string; time?: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [chatSessions, setChatSessions] = useState<any[]>([]);
@@ -112,7 +112,11 @@ export default function ChatInterface() {
       // Update the chat history with the bot's response
       setChatHistory((prevChatHistory) => [
         ...prevChatHistory,
-        { role: 'model', message: botResponse },
+        {
+          role: 'model',
+          message: botResponse,
+          time: langGraphData.responseTime,
+        },
       ]);
 
       // Optionally handle the chunks response
@@ -407,18 +411,23 @@ export default function ChatInterface() {
                 }`}
               >
                 {chat.role === 'model' && index === chatHistory.length - 1 ? (
-                  <TypeAnimation
-                    sequence={[
-                      chat.message, // Message to type out
-                      () => {
-                        // Callback to scroll to the bottom after typing
-                        scrollToBottom();
-                      },
-                    ]}
-                    speed={95} // Typing speed
-                    wrapper="span"
-                    repeat={0} // Do not repeat
-                  />
+                  <>
+                    <p className="text-yellow-400 ">{`Replied in ${
+                      chat.time ? parseInt(chat.time, 10) / 1000 : 0
+                    }`}</p>
+                    <TypeAnimation
+                      sequence={[
+                        chat.message, // Message to type out
+                        () => {
+                          // Callback to scroll to the bottom after typing
+                          scrollToBottom();
+                        },
+                      ]}
+                      speed={95} // Typing speed
+                      wrapper="span"
+                      repeat={0} // Do not repeat
+                    />
+                  </>
                 ) : (
                   <ReactMarkdown
                     // eslint-disable-next-line react/no-children-prop

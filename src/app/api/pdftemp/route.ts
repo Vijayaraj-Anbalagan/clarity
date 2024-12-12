@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Prepare file for upload
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const fileStream = Readable.from(fileBuffer);
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${uploadKey}`;
 
-    axios.post('https://c47d-117-96-40-60.ngrok-free.app/pdfUpload', {
+    axios.post('http://localhost:5000/pdfUpload', {
       fileUrl,
     });
     // Assuming you have a File model and a way to save it
