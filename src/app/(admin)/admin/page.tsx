@@ -47,7 +47,13 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import ProgressBar from '@/components/ui/progress-bar';
 import { Label } from '@/components/ui/label';
 
@@ -147,7 +153,6 @@ export default function DashboardUI() {
   const [files, setFiles] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
- 
   const fetchEmployees = async () => {
     const response = await fetch('/api/employeeDetails');
     const data = await response.json();
@@ -160,13 +165,10 @@ export default function DashboardUI() {
     fetchEmployees();
   }, []);
 
-  
-
-
-      // Fetch files from the server
+  // Fetch files from the server
   const fetchFiles = async () => {
     try {
-      const response = await fetch('/api/pdfttemp');
+      const response = await fetch('/api/pdftemp');
       const data = await response.json();
       setFileList(data.document);
     } catch (error) {
@@ -202,11 +204,13 @@ export default function DashboardUI() {
         body: formData,
       });
 
-      const data = await response.json();
+      const data  = await response.json();
 
       if (response.ok) {
         setUploadStatus('File uploaded successfully.');
         fetchFiles(); // Refresh file list
+        setFileList(data.document);
+        setUploadProgress(100);
       } else {
         setUploadStatus(data.error || 'Upload failed.');
       }
@@ -219,7 +223,6 @@ export default function DashboardUI() {
     }
   };
 
-  
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar Navigation */}
@@ -489,37 +492,42 @@ export default function DashboardUI() {
                     />
                   </div>
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Upload File</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="file" className="text-right">
-                File
-              </Label>
-              <Input
-                id="file"
-                type="file"
-                className="col-span-3"
-                onChange={handleFileChange}
-                disabled={isUploading}
-              />
-            </div>
-          </div>
-          {isUploading && (
-            <ProgressBar progress={uploadProgress} />
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isUploading}>
-              Cancel
-            </Button>
-            <Button onClick={handleConfirm} disabled={!selectedFile || isUploading}>
-              {isUploading ? 'Uploading...' : 'Confirm'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Upload File</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="file" className="text-right">
+                            File
+                          </Label>
+                          <Input
+                            id="file"
+                            type="file"
+                            className="col-span-3"
+                            onChange={handleFileChange}
+                            disabled={isUploading}
+                          />
+                        </div>
+                      </div>
+                      {isUploading && <ProgressBar progress={uploadProgress} />}
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => setIsDialogOpen(false)}
+                          disabled={isUploading}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleConfirm}
+                          disabled={!selectedFile || isUploading}
+                        >
+                          {isUploading ? 'Uploading...' : 'Confirm'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -855,4 +863,3 @@ function setUploadStatus(arg0: string) {
 function setFileUrl(fileUrl: any) {
   throw new Error('Function not implemented.');
 }
-

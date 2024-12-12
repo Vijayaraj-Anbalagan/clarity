@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { Readable } from 'stream';
+import axios from 'axios';
+import File from '@/models/files';
+import { cookiesParse } from '@/utils/cookies';
 
 // Initialize S3 client
 const s3Client = new S3Client({
@@ -15,6 +18,7 @@ const s3Client = new S3Client({
 let mockDatabase: any[] = []; // Simulated database for uploaded file metadata
 
 export async function POST(req: NextRequest) {
+  const user = await cookiesParse(req);
   try {
     if (!req.headers.get('content-type')?.includes('multipart/form-data')) {
       return NextResponse.json(
@@ -49,6 +53,10 @@ export async function POST(req: NextRequest) {
     const result = await upload.done();
     const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uploadKey}`;
 
+    await axios.post('http://localhost:5000/pdfUpload', {
+      fileUrl,
+    });
+
     // Add file metadata to mock database
     const uploadedFile = {
       id: mockDatabase.length + 1,
@@ -57,8 +65,28 @@ export async function POST(req: NextRequest) {
       date: new Date(),
       status: 'Uploaded',
     };
-    mockDatabase.push(uploadedFile);
 
+    const existingFile = await File.findOne({ user: user._id });
+
+    if (existingFile) {
+      existingFile.files.push({
+        fileName: file.name,
+        url: fileUrl,
+        details: 'Uploaded file',
+      });
+      await existingFile.save();
+    } else {
+      const newFile = new File({
+        user: user._id,
+        files: [
+          {
+            fileName: file.name,
+            url: fileUrl,
+          },
+        ],
+      });
+      await newFile.save();
+    }
     return NextResponse.json({
       message: 'File uploaded successfully.',
       fileUrl,
