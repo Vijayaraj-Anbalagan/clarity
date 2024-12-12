@@ -44,7 +44,7 @@ Avoid unnecessary elaboration or redundant information.
 Context-Dependent Responses:
 
 Use only the retrieved context provided from the document to answer the query 
-and also remove the badwords , unparlimentary words across languages such as English and Hindi replace and rephrase the sentences.
+and also remove the badwords , unparlimentary words across replace and rephrase the sentences like foolish dumb silly horrible incompetent idiotic unwise clueless clumsy absurd ridiculous naive thoughtless moronic dense stupid vacuous.
 Exclude any unrelated details or content that does not directly address the user’s question.
 Retain Key Information:
 
