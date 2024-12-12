@@ -29,6 +29,7 @@ export default function ChatInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [isTypingCompleted, setIsTypingCompleted] = useState(false);
 
   const scrollToBottom = () => {
     if (chatEndRef.current) {
@@ -40,6 +41,15 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [chatHistory]);
 
+  const renderMarkdown = (text: string | null | undefined) => (
+    <ReactMarkdown
+      // eslint-disable-next-line react/no-children-prop
+      children={text}
+      remarkPlugins={[remarkGfm]} // Enable GitHub Flavored Markdown
+      className="prose prose-sm prose-invert inline" // Ensure inline styling
+    />
+  );
+  
   const handleLogout = async () => {
     try {
       await axios.get('api/logout');
@@ -153,6 +163,13 @@ export default function ChatInterface() {
   useEffect(() => {
     fetchChatSessions();
   }, []);
+
+  useEffect(() => {
+    if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'model') {
+      setIsTypingCompleted(false); // Reset state for new message
+    }
+  }, [chatHistory]);
+  
 
   const fetchChatSessions = async () => {
     try {
@@ -410,32 +427,38 @@ export default function ChatInterface() {
                     : 'bg-stone-800 text-white'
                 }`}
               >
+                <>
                 {chat.role === 'model' && index === chatHistory.length - 1 ? (
-                  <>
-                    <p className="text-yellow-400 ">{`Replied in ${
-                      chat.time ? parseInt(chat.time, 10) / 1000 : 0
-                    }`}</p>
-                    <TypeAnimation
-                      sequence={[
-                        chat.message, // Message to type out
-                        () => {
-                          // Callback to scroll to the bottom after typing
-                          scrollToBottom();
-                        },
-                      ]}
-                      speed={95} // Typing speed
-                      wrapper="span"
-                      repeat={0} // Do not repeat
-                    />
-                  </>
-                ) : (
-                  <ReactMarkdown
-                    // eslint-disable-next-line react/no-children-prop
-                    children={chat.message}
-                    remarkPlugins={[remarkGfm]}
-                    className="prose prose-sm prose-invert"
-                  />
-                )}
+        <>
+          <p className="text-yellow-400 text-sm mb-1">{`Replied in ${
+            chat.time ? (parseInt(chat.time, 10) / 1000).toFixed(2) : '0'
+          } seconds`}</p>
+          <TypeAnimation
+            sequence={[
+              chat.message,
+              () => {
+                // Mark typing as complete
+                setIsTypingCompleted(true);
+                // Scroll to the bottom after typing
+                scrollToBottom();
+              },
+            ]}
+            speed={95} // Typing speed
+            wrapper="span"
+            repeat={0} // Do not repeat
+            className={isTypingCompleted ? 'prose prose-sm prose-invert' : ''}
+          />
+        </>
+      ) : (
+        <ReactMarkdown
+          // eslint-disable-next-line react/no-children-prop
+          children={chat.message}
+          remarkPlugins={[remarkGfm]} // Enable GitHub Flavored Markdown
+          className="prose prose-sm prose-invert"
+        />
+      )}
+
+                </>
               </div>
             </div>
           ))}
