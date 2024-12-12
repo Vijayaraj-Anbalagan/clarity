@@ -47,6 +47,9 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ProgressBar from '@/components/ui/progress-bar';
+import { Label } from '@/components/ui/label';
 
 interface FileList {
   fileName: string;
@@ -132,168 +135,19 @@ const sampleAlerts = [
   },
 ];
 
-const sampleEmployees = [
-  {
-    id: 1,
-    name: 'Dinesh Kumar',
-    department: 'Marketing',
-    engagementScore: 65,
-    sentiment: 'Neutral',
-  },
-  {
-    id: 2,
-    name: 'Rahul Sharma',
-    department: 'R&D',
-    engagementScore: 70,
-    sentiment: 'Positive',
-  },
-  {
-    id: 3,
-    name: 'Vivek Gupta',
-    department: 'IT',
-    engagementScore: 85,
-    sentiment: 'Very Positive',
-  },
-  {
-    id: 4,
-    name: 'Anjali Mehta',
-    department: 'Accounts',
-    engagementScore: 60,
-    sentiment: 'Negative',
-  },
-  {
-    id: 5,
-    name: 'Priya Singh',
-    department: 'HR',
-    engagementScore: 72,
-    sentiment: 'Neutral',
-  },
-  {
-    id: 6,
-    name: 'Arjun Patel',
-    department: 'IT',
-    engagementScore: 90,
-    sentiment: 'Very Positive',
-  },
-  {
-    id: 7,
-    name: 'Neha Verma',
-    department: 'Marketing',
-    engagementScore: 68,
-    sentiment: 'Positive',
-  },
-];
-
-const sampleFiles = [
-  {
-    id: 1,
-    name: 'IT_Policy.pdf',
-    uploadDate: '2023-06-15',
-    status: 'Processed',
-  },
-  {
-    id: 2,
-    name: 'HR_Policy.pdf',
-    uploadDate: '2023-06-10',
-    status: 'Processing',
-  },
-  {
-    id: 3,
-    name: 'Marketing_Strategy.docx',
-    uploadDate: '2023-06-05',
-    status: 'Processed',
-  },
-  {
-    id: 4,
-    name: 'Q1_Financials.pdf',
-    uploadDate: '2023-06-01',
-    status: 'Processed',
-  },
-  {
-    id: 5,
-    name: 'Employee_Code_Of_Conduct.pdf',
-    uploadDate: '2023-05-30',
-    status: 'Processing',
-  },
-  {
-    id: 6,
-    name: 'Annual_Report.pptx',
-    uploadDate: '2023-05-25',
-    status: 'Processed',
-  },
-  {
-    id: 7,
-    name: 'Product_Details.docx',
-    uploadDate: '2023-05-20',
-    status: 'Processed',
-  },
-  {
-    id: 8,
-    name: 'Q3_Sales_Forecast.xlsx',
-    uploadDate: '2023-05-15',
-    status: 'Processing',
-  },
-  {
-    id: 9,
-    name: 'Employee_Feedback_Results.pdf',
-    uploadDate: '2023-05-10',
-    status: 'Processed',
-  },
-  {
-    id: 10,
-    name: 'Project_Roadmap.docx',
-    uploadDate: '2023-05-05',
-    status: 'Processed',
-  },
-];
-
 export default function DashboardUI() {
-  const [activeTab, setActiveTab] = useState('overview'); // State for managing active tab
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [fileList, setFileList] = useState<FileList[] | null>(null);
   const [employeeData, setEmployeeData] = useState<EmployeeData[] | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string[]>([]);
+  const [files, setFiles] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert('Please select a file first.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
-    try {
-      const response = await fetch('/api/pdftemp', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setUploadStatus('File uploaded successfully.');
-        setFileUrl(data.fileUrl);
-      } else {
-        setUploadStatus(data.error);
-      }
-    } catch (error) {
-      setUploadStatus('An error occurred while uploading the file.');
-    }
-  };
-  const fetchFiles = async () => {
-    const response = await fetch('/api/fileFetch');
-    const data = await response.json();
-    setFileList(data.document);
-  };
-
+ 
   const fetchEmployees = async () => {
     const response = await fetch('/api/employeeDetails');
     const data = await response.json();
@@ -306,7 +160,66 @@ export default function DashboardUI() {
     fetchEmployees();
   }, []);
 
-  console.log('ep', employeeData);
+  
+
+
+      // Fetch files from the server
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch('/api/pdfttemp');
+      const data = await response.json();
+      setFileList(data.document);
+    } catch (error) {
+      console.error('Error fetching files:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFiles();
+  }, []);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('/api/pdfttemp', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUploadStatus('File uploaded successfully.');
+        fetchFiles(); // Refresh file list
+      } else {
+        setUploadStatus(data.error || 'Upload failed.');
+      }
+    } catch (error) {
+      setUploadStatus('An error occurred while uploading the file.');
+    } finally {
+      setIsUploading(false);
+      setSelectedFile(null);
+      setIsDialogOpen(false);
+    }
+  };
+
+  
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar Navigation */}
@@ -563,8 +476,7 @@ export default function DashboardUI() {
                   <div>
                     <Button
                       className="bg-yellow-400 hover:bg-yellow-500 text-black"
-                      onClick={handleUpload}
-                      disabled={!selectedFile}
+                      onClick={() => setIsDialogOpen(true)}
                     >
                       <Upload className="h-4 w-4 mr-2" />
                       Upload File
@@ -576,6 +488,38 @@ export default function DashboardUI() {
                       onChange={handleFileChange}
                     />
                   </div>
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Upload File</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="file" className="text-right">
+                File
+              </Label>
+              <Input
+                id="file"
+                type="file"
+                className="col-span-3"
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
+            </div>
+          </div>
+          {isUploading && (
+            <ProgressBar progress={uploadProgress} />
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={isUploading}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirm} disabled={!selectedFile || isUploading}>
+              {isUploading ? 'Uploading...' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -904,3 +848,11 @@ export default function DashboardUI() {
     </div>
   );
 }
+function setUploadStatus(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+
+function setFileUrl(fileUrl: any) {
+  throw new Error('Function not implemented.');
+}
+
