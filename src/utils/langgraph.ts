@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 
 // Initialize Groq
 const groq = new Groq();
-const socket = io('https://80a7-117-96-40-60.ngrok-free.app');
+const socket = io('http://localhost:5000');
 
 socket.on('connect', () => {
   console.log('Connected to the server.');
@@ -35,24 +35,45 @@ async function performRAG(
         {
           role: 'system',
           content: `
-You are Clarity, an intelligent enterprise assistant chatbot designed for organizational use.
-Your primary role is to provide precise, professional, and actionable responses to user queries related to HR policies, IT support, company events, and legal information.
+You are an intelligent AI assistant specialized in analyzing and responding to queries about chunks that are based on the provided document in the backend you will recive the top 3 nearest chunks.
 
-Guidelines:
-1. Base all responses exclusively on the retrieved context provided below.
-2. Do not include any information or assumptions not explicitly mentioned in the context.
-3. If the requested information is unavailable in the provided context, respond politely with:
-   "I'm sorry, I could not find the information you are looking for in the provided context. Please reach out to the appropriate department for further assistance."
-4. Maintain a formal, professional, and concise tone.
-5. Avoid embellishments, unnecessary framing, or speculative details.
-6. Begin directly with actionable information, avoiding phrases like "Based on the context provided" or "The procedure is as follows.
+Core Capabilities:
+1. Understand and interpret the document's content comprehensively
+2. Provide breif ,precise, professional, and context-specific responses
 
-Context: ${context}"
+Key Operational Guidelines:
+1. Always prioritize accuracy and relevance to the document's content
+2. Adapt response style to the specific user query
+3. If information is not in the document, clearly state that "I am sorry I am not able to find the information in the document Kindly reach out to the HR department for more information"
+4. Avoid very long answers and provide concise responses, not exceeding 3-5 lines
+
+Document Context Handling:
+- For specific queries, extract and present relevant information directly
+- For summary requests, provide a concise overview of key points
+
+
+Interaction Principles:
+- Be conversational yet professional
+- Show understanding of the document's nuanced content
+- Demonstrate ability to break down complex information
+- Provide actionable and clear responses
+
+Special Instructions for Different Query Types:
+- Complex Queries: Break down information systematically
+- Summary Requests: Condense key points effectively
+
+Error Handling:
+- If query cannot be answered from document, clearly communicate limitations
+- Never fabricate or guess information not present in the document 
           `,
         },
         {
           role: 'user',
-          content: userPrompt,
+          content:
+            'Answer the following query of the user : with respect to the context provided follow the system and the guidelines that are mentioned in it and do answer this ' +
+            userPrompt +
+            'from The Context Extracted from the Pdf :' +
+            context,
         },
       ],
       model: 'llama-3.2-1b-preview',
@@ -107,32 +128,34 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
   try {
     const classificationPrompt = `
       User query: "${query}"
-      Your task is to classify the given user query into one of the following categories if query related to organizational matters such as anything related to organizational matters : [Organisation, Not Related to Organisation].
-      If you find the query is not related to organisational matters but also partially related to organisational matters , please classify it as 'Organisation'.
-      Please remember that 'Organistional matters' meaning anything related to HR policies, IT support, company events, and legal information and not about general or public information.
+      Your task is to classify the given user query into one of the following categories such as classification should be 0.9 as Organisation that is always and almost organisation if and only if the question is greeting and other generalised chat that is of 0.1 as Not Related to Organisation : [Organisation, Not Related to Organisation].
+      If you find the query is related to greetings and other chat based continuation words like okay , then and so , please classify it as 'Not Related to Organisation'.
       Only respond with the category name and the reason for opting that category as the following format of json.
       {
         "category": "Category_name",
         "reason": "The reason for opting that category."
       }
 
-       Examples of 'Organisation' queries:
-      - "What is the privacy policy of our company?"
-      - "How do I access the HR portal?"
-      - "Tell me about the upcoming company event."
-      - "What are the IT support hours?"
-      - "What is the process for submitting a leave request?"
-      - "How do I report a security incident?"
-      - "What is the procedure for booking a conference room?"
-      - "How do I access the company handbook?"
+      Examples of 'Organisation' queries:
+        -What are some popular botnets that were tracked and mitigated in 2013?
+        -What are the common types of botnets?
+        -What are some examples of botnets?
+        -What vulnerabilities in NTP servers can be exploited for DrDoS attacks?
+        -How do watering hole attacks function in the context of targeted organizations?
+        -How do zero-day vulnerabilities in software like Internet Explorer impact security?
+        -How do attackers typically gain control of a victim's workstation?
+        -How do watering hole attacks function in the context of targeted organizations?
+
+     
       
       Examples of 'Not Related to Organisation' queries:
-      - "What is the weather today?"
-      - "Tell me a joke."
-      - "What is the capital of France?"
-      - "What is the latest movie in theaters?"
-      - "What is the best restaurant in town?"
-    `;
+        - "What is the weather today?"
+        - "Hi, how are you?"
+        - "What is the time now?"
+        - "Can you tell me a joke?"
+        - "Thanks"
+        - "Okay"
+        - "I am fine"`;
 
     const classificationResponse = await performLLM(classificationPrompt);
     console.log('Classification Response:', classificationResponse);
@@ -147,7 +170,7 @@ async function router(state: typeof StateAnnotation.State): Promise<string> {
   }
 
   console.log('Routing to LLM');
-  return 'LLM';
+  return 'RAG';
 }
 
 // Workflow nodes
