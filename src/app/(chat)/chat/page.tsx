@@ -89,11 +89,10 @@ export default function ChatInterface() {
           headers: { 'Content-Type': 'application/json' },
           body: langGraphPayload,
         }),
-        fetch('https://localhost:5000/query', {
+        fetch('http://localhost:5000/query', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: chunksRetrievalPayload,
-          mode: 'no-cors',
         }),
       ]);
 
