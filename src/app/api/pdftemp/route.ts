@@ -4,7 +4,6 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { Readable } from 'stream';
 import File from '@/models/files';
 import { cookiesParse } from '@/utils/cookies';
-import { parseAndFetchPDFResult } from '../../../../llamaparser';
 import axios from 'axios';
 
 export async function POST(req: NextRequest) {

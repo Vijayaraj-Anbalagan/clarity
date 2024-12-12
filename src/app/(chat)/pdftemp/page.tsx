@@ -23,7 +23,7 @@ const UploadPage = () => {
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('/api/pdftemp', {
+      const response = await fetch('/api/pdfttemp', {
         method: 'POST',
         body: formData,
       });
