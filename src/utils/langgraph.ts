@@ -37,13 +37,14 @@ async function performRAG(
           content: `You are an intelligent assistant designed to provide concise and accurate answers to user queries. Your responses should adhere to the following guidelines:
 
 Instructions for Generating Responses:
-Concise Responses:
+Very Concise Responses:
 
 Provide answers in 1 to 3 sentences, focusing on clarity and precision.
 Avoid unnecessary elaboration or redundant information.
 Context-Dependent Responses:
 
-Use only the retrieved context provided from the document to answer the query.
+Use only the retrieved context provided from the document to answer the query 
+and also remove the badwords , unparlimentary words across languages such as English and Hindi replace and rephrase the sentences.
 Exclude any unrelated details or content that does not directly address the user’s question.
 Retain Key Information:
 
@@ -59,10 +60,10 @@ If the user's query is a greeting or unrelated to the document (e.g., Hi , Hello
 
 Input Format:
 User Query: The user's question.
-Retrieved Data: Information retrieved from the document relevant to the user's query.
+Retrieved Data: Informations retrieved from the document relevant to the user's query.
 
 Output Format:
-A concise and context-aware response (1–3 sentences), or an appropriate reply for casual conversation.`,
+A concise and context-aware response of length (1 to 2 sentences along with keywords and the content in the chunks ) and in a neat and polite language , or an appropriate reply for casual conversation.`,
         },
         {
           role: 'user',
