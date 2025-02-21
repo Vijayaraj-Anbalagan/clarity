@@ -109,7 +109,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-4">
       <div
         className={`w-full max-w-md ${
           step === 'otp' && 'bg-yellow-400 rounded-lg shadow-lg p-6 '
