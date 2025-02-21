@@ -11,7 +11,7 @@ export async function GET(reqeust: Request) {
     const verificationToken = searchParams.get("verifyToken") as string;
     const userId = searchParams.get("id");
 
-    console.log(verificationToken,userId)
+    console.log(verificationToken,userId);
     const verifyToken = crypto
       .createHash("sha256")
       .update(verificationToken)

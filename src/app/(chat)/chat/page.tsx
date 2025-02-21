@@ -16,10 +16,8 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { TypeAnimation } from 'react-type-animation';
-import { io } from 'socket.io-client';
 
 export default function ChatInterface() {
-  const socket = io('https://80a7-117-96-40-60.ngrok-free.app');
   const router = useRouter();
   const [inputValue, setInputValue] = useState('');
   const [chatHistory, setChatHistory] = useState<
@@ -51,19 +49,6 @@ export default function ChatInterface() {
       console.error(error);
     }
   };
-  useEffect(() => {
-    // Notify server about user session
-    socket.emit('userSession', userId);
-
-    // Listen for chat responses from the server
-    socket.on('chatResponse', (data) => {
-      
-    });
-
-    return () => {
-      socket.off('chatResponse');
-    };
-  }, [userId]);
 
   const [sessionId, setSessionId] = useState<string | null>(null); // Store session ID
 
@@ -165,12 +150,11 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     const ragPayload = JSON.stringify({
-      query,
-      history: chatHistory,
+      prompt: query,
       sessionId,
     });
     try {
-      const botResponse = await axios.post('/api/rag', ragPayload);
+      const botResponse = await axios.post('/api/llm', ragPayload);
       if (!botResponse) {
         throw new Error('Failed to fetch one or more APIs');
       }
@@ -476,7 +460,7 @@ export default function ChatInterface() {
                         scrollToBottom();
                       },
                     ]}
-                    speed={50} // Typing speed
+                    speed={90} // Typing speed
                     wrapper="span"
                     repeat={0} // Do not repeat
                   />

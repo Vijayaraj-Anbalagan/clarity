@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,6 +36,7 @@ import {
   Eye,
   Download,
   Trash2,
+  Option,
 } from 'lucide-react';
 import {
   BarChart,
@@ -249,13 +250,13 @@ const sampleFiles = [
 
 export default function DashboardUI() {
   const [activeTab, setActiveTab] = useState('overview'); // State for managing active tab
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileList, setFileList] = useState<FileList[] | null>(null);
   const [employeeData, setEmployeeData] = useState<EmployeeData[] | null>(null);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
@@ -560,7 +561,7 @@ export default function DashboardUI() {
                   <CardTitle className="text-yellow-400">
                     File Management
                   </CardTitle>
-                  <div>
+                  <div className='flex '>
                     <Button
                       className="bg-yellow-400 hover:bg-yellow-500 text-black"
                       onClick={handleUpload}
@@ -569,12 +570,22 @@ export default function DashboardUI() {
                       <Upload className="h-4 w-4 mr-2" />
                       Upload File
                     </Button>
-                    <input
-                      style={{ display: 'none' }} // Hide the input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleFileChange}
-                    />
+                    <div>
+                      <Button
+                        className="bg-yellow-400 hover:bg-yellow-500 text-black ml-2 flex items-center"
+                        onClick={() => fileInputRef.current?.click()} // Manually trigger file input
+                      >
+                        <Option className="h-4 w-4 mr-2" />
+                        Choose File
+                      </Button>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        ref={fileInputRef} // Reference to input element
+                        onChange={handleFileChange}
+                        className="hidden" // Hide the default input
+                      />
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
